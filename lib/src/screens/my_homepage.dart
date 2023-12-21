@@ -1,10 +1,10 @@
+import 'dart:async';
+
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
-import 'package:pedometer/pedometer.dart';
 import 'package:steps_ahead/constants.dart';
 import 'package:steps_ahead/src/controllers/controllers.dart';
 import 'package:steps_ahead/src/screens/screens.dart';
-import 'package:steps_ahead/src/utils/transformer_utils.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -23,6 +23,11 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -76,53 +81,29 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
               const SizedBox(height: 16),
-              StreamBuilder<StepCount>(
-                stream: pedometerController.stepCountStream,
-                builder: (context, snapshot) {
-                  var val = snapshot.data?.steps ?? 0;
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            pedometerController.currentSteps.toString(),
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineLarge
-                                ?.copyWith(
-                                  fontSize: 36,
-                                  color: kPrimaryColorValue.toColor!,
-                                ),
-                          ),
-                          const SizedBox(width: 16),
-                          Text(
-                            "/",
-                            style: Theme.of(context).textTheme.headlineSmall,
-                          ),
-                          const SizedBox(width: 16),
-                          Text(
-                            dailyGoal.toString(),
-                            style: Theme.of(context).textTheme.headlineSmall,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      LinearProgressIndicator(
-                        value: pedometerController.currentSteps / dailyGoal,
-                        borderRadius: BorderRadius.circular(10),
-                        color: kPrimaryColorValue.toColor!,
-                        backgroundColor: kGrayColorValue.toColor!,
-                      ),
-                    ],
-                  );
-                },
+              buildStreamBuilder(
+                pedometerController.stepCountStream.map(
+                  (event) => event.steps,
+                ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget buildStreamBuilder(Stream<int> stepCountStream) {
+    return StreamBuilder<int>(
+      stream: stepCountStream,
+      builder: (context, snapshot) {
+        var val = snapshot.data ?? 0;
+
+        return ProgressUI(
+          currentSteps: val,
+          dailyGoal: dailyGoal,
+        );
+      },
     );
   }
 }

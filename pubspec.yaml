@@ -30,4 +30,5 @@ flutter:
   assets:
     - assets/icons/logo-transparent.png
     - assets/icons/logo_lottie.json
+    - assets/progress/tree-1/
   uses-material-design: true
