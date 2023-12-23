@@ -5,8 +5,11 @@ const kLogoAsset = "assets/icons/logo.png";
 const kLogoTransparentAsset = "assets/icons/logo-transparent.png";
 const kLogoLottieAsset = "assets/icons/logo_lottie.json";
 
-const kSettingsDailyGoalKey = "daily_goal";
-const kSettingsDailyGoalDefault = 7500;
+const kSettingsKeyDailyGoal = "daily_goal";
+const kSettingsDefaultDailyGoal = 7500;
+
+const kSettingsKeyLastSensorOutput = "last_sensor_output";
+const kSettingsDefaultLastSensorOutput = 0;
 
 const kCustomProgressAssetPathPrefix = "assets/progress/tree-1";
 const kCustomProgressAssetPathMultiplier = 2;

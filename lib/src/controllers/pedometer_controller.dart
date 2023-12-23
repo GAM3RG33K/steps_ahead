@@ -1,15 +1,22 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:steps_ahead/constants.dart';
+import 'package:steps_ahead/src/controllers/storage_controller.dart';
+import 'package:steps_ahead/src/models/models.dart';
 import 'package:steps_ahead/src/utils/utils.dart';
+
+export 'package:steps_ahead/src/models/models.dart'
+    show PedestrianStatusData, StepData;
 
 PedometerController get pedometerController => PedometerController._instance!;
 
 class PedometerController {
-  final SharedPreferences storage;
+  final StorageController storage;
 
   PedometerController._(this.storage);
 
@@ -18,10 +25,16 @@ class PedometerController {
   Future<PermissionStatus> get appPermissionStatus async =>
       await Permission.activityRecognition.status;
 
-  Stream<PedestrianStatus> get pedestrianStatusStream =>
-      Pedometer.pedestrianStatusStream;
+  StreamController<PedestrianStatusData> pedestrianStatusStreamController =
+      StreamController.broadcast();
 
-  Stream<StepCount> get stepCountStream => Pedometer.stepCountStream;
+  Stream<PedestrianStatusData> get pedestrianStatusStream =>
+      pedestrianStatusStreamController.stream;
+
+  StreamController<StepData> stepCountStreamController =
+      StreamController.broadcast();
+
+  Stream<StepData> get stepCountStream => stepCountStreamController.stream;
 
   int currentSteps = 0;
 
@@ -29,8 +42,8 @@ class PedometerController {
 
   static Future<PedometerController> getInstance() async {
     if (!isInitialized) {
-      final storage = await SharedPreferences.getInstance();
-      _instance = PedometerController._(storage);
+      final _storage = await StorageController.getInstance();
+      _instance = PedometerController._(_storage);
       await _initPedometerStreams(_instance!);
     }
     return _instance!;
@@ -47,19 +60,47 @@ class PedometerController {
       );
     }
 
-    instance.pedestrianStatusStream
-        .listen(onPedestrianStatusChanged)
-        .onError(onPedestrianStatusError);
-
-    instance.stepCountStream.listen(
+    Pedometer.pedestrianStatusStream.listen(
       (event) {
-        instance.currentSteps = event.steps;
+        onPedestrianStatusChanged(event);
+        instance.pedestrianStatusStreamController.sink.add(
+          PedestrianStatusData.fromNativeData(
+            type: event.status,
+            timestamp: event.timeStamp,
+          ),
+        );
+      },
+    ).onError(onPedestrianStatusError);
+
+    Pedometer.stepCountStream.listen(
+      (event) {
         onStepCount(event);
+        final newSteps = instance.getUpdatedCurrentSteps(event);
+        instance.todayStepData = newSteps;
+        instance.stepCountStreamController.sink.add(newSteps);
       },
     ).onError(onStepCountError);
+
+    // // update steps
+    // final lastSensorOutput = (await Pedometer.stepCountStream.last);
+    // onStepCount(lastSensorOutput);
+    // final newSteps = instance.getUpdatedCurrentSteps(lastSensorOutput);
+    // instance.stepCountStreamController.sink.add(newSteps);
+
+    // // update status
+    // final lastSensorStatus = (await Pedometer.pedestrianStatusStream.last);
+    // onPedestrianStatusChanged(lastSensorStatus);
+    // instance.pedestrianStatusStreamController.sink.add(
+    //   PedestrianStatusData.fromNativeData(
+    //     type: lastSensorStatus.status,
+    //     timestamp: lastSensorStatus.timeStamp,
+    //   ),
+    // );
   }
 
   Future<void> onAppLifecycleStateChange(AppLifecycleState state) async {
+    storage.onAppLifecycleStateChange(state);
+
     // These are the callbacks
     switch (state) {
       case AppLifecycleState.resumed:
@@ -80,31 +121,53 @@ class PedometerController {
     }
   }
 
-  Object? getSetting(String key) => storage.get(key);
+  int get dailyGoal =>
+      storage.getSettingInt(kSettingsKeyDailyGoal) ?? kSettingsDefaultDailyGoal;
 
-  String? getSettingString(String key) => storage.getString(key);
+  StepData get todayStepData =>
+      getStepDataFromDateTime(DateTime.now().toDateString!) ??
+      StepData(
+        lastUpdateTimeStamp: DateTime.now(),
+        steps: 0,
+      );
 
-  bool? getSettingBool(String key) => storage.getBool(key);
+  set todayStepData(StepData stepData) => setStepDataFromDateTime(
+        stepData.lastUpdateTimeStamp.toDateString!,
+        stepData,
+      );
 
-  int? getSettingInt(String key) => storage.getInt(key);
+  int get lastSensorOutputFromStorage =>
+      storage.getSettingInt(kSettingsKeyLastSensorOutput) ??
+      kSettingsDefaultLastSensorOutput;
 
-  double? getSettingDouble(String key) => storage.getDouble(key);
+  set lastSensorOutputFromStorage(int steps) => storage.setSettingInt(
+        kSettingsKeyLastSensorOutput,
+        steps,
+      );
 
-  List<String>? getSettingStringList(String key) => storage.getStringList(key);
+  StepData getUpdatedCurrentSteps(StepCount stepCount) {
+    final lastSensorData = lastSensorOutputFromStorage;
+    final sensorDiff = max(lastSensorData - stepCount.steps, 0);
+    lastSensorOutputFromStorage = stepCount.steps;
 
-  Future<bool> setSettingString(String key, String val) =>
-      storage.setString(key, val);
+    final newSteps = todayStepData.addSteps(sensorDiff);
+    return newSteps;
+  }
 
-  Future<bool> setSettingBool(String key, bool val) =>
-      storage.setBool(key, val);
+  StepData? getStepDataFromDateTime(String date) {
+    final jsonString = storage.getSettingString(date);
+    if (jsonString == null || jsonString.isEmpty) {
+      return null;
+    }
+    return StepData.fromJson(jsonDecode(jsonString));
+  }
 
-  Future<bool> setSettingInt(String key, int val) => storage.setInt(key, val);
-
-  Future<bool> setSettingDouble(String key, double val) =>
-      storage.setDouble(key, val);
-
-  Future<bool> setSettingStringList(String key, List<String> val) =>
-      storage.setStringList(key, val);
+  Future<bool>? setStepDataFromDateTime(String date, StepData data) {
+    return storage.setSettingString(
+      date,
+      jsonEncode(data.toJson()),
+    );
+  }
 }
 
 void onStepCount(StepCount event) {

@@ -1,3 +1,4 @@
+import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:steps_ahead/constants.dart';
 import 'package:steps_ahead/src/controllers/controllers.dart';
@@ -11,12 +12,13 @@ class AppSettingsScreen extends StatefulWidget {
 }
 
 class _AppSettingsScreenState extends State<AppSettingsScreen> {
-  int dailyGoal = kSettingsDailyGoalDefault;
+  int dailyGoal = kSettingsDefaultDailyGoal;
 
   @override
   void initState() {
-    dailyGoal = pedometerController.getSettingInt(kSettingsDailyGoalKey) ??
-        kSettingsDailyGoalDefault;
+    dailyGoal =
+        pedometerController.storage.getSettingInt(kSettingsKeyDailyGoal) ??
+            kSettingsDefaultDailyGoal;
     super.initState();
   }
 
@@ -30,6 +32,16 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
+            buildSettingTile(
+              title: "System Settings",
+              subtitle: "Open System settings for this app",
+              onClick: () async {
+                await AppSettings.openAppSettings(
+                  type: AppSettingsType.settings,
+                );
+              },
+            ),
+            buildSeparator(),
             buildTitle("Goals"),
             buildSettingTile(
               title: "Daily Goal",
@@ -45,8 +57,8 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                   final number = num.tryParse(input ?? '')?.toInt();
                   if (number != null) {
                     dailyGoal = number;
-                    pedometerController.setSettingInt(
-                      kSettingsDailyGoalKey,
+                    pedometerController.storage.setSettingInt(
+                      kSettingsKeyDailyGoal,
                       dailyGoal,
                     );
                   }
@@ -64,8 +76,8 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            color: kPrimaryColorValue.toColor!,
-          ),
+        color: kPrimaryColorValue.toColor!,
+      ),
     );
   }
 
@@ -81,9 +93,9 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       ),
       subtitle: subtitle != null
           ? Text(
-              subtitle,
-              style: Theme.of(context).textTheme.bodySmall,
-            )
+        subtitle,
+        style: Theme.of(context).textTheme.bodySmall,
+      )
           : null,
       onTap: onClick,
     );

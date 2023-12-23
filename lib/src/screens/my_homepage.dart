@@ -1,10 +1,8 @@
-import 'dart:async';
-
-import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:steps_ahead/constants.dart';
 import 'package:steps_ahead/src/controllers/controllers.dart';
 import 'package:steps_ahead/src/screens/screens.dart';
+import 'package:steps_ahead/src/utils/transformer_utils.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -16,9 +14,25 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int get dailyGoal =>
-      pedometerController.getSettingInt(kSettingsDailyGoalKey) ??
-      kSettingsDailyGoalDefault;
+  int _bottomNavIndex = 1;
+
+  List<NavBarEntry> navbarItems = [
+    NavBarEntry(
+      title: 'Forest',
+      iconData: Icons.forest_outlined,
+      activeIconData: Icons.forest,
+    ),
+    NavBarEntry(
+      title: 'Tree',
+      iconData: Icons.offline_bolt_outlined,
+      activeIconData: Icons.offline_bolt,
+    ),
+    NavBarEntry(
+      title: 'Stats',
+      iconData: Icons.show_chart,
+      activeIconData: Icons.show_chart,
+    ),
+  ];
 
   @override
   void initState() {
@@ -37,73 +51,105 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
         actions: [
-          PopupMenuButton(
-            itemBuilder: (context) {
-              return [
-                PopupMenuItem(
-                  onTap: () async {
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const AppSettingsScreen(),
-                      ),
-                    );
-                    setState(() {});
-                  },
-                  child: const Text('App Settings'),
+          Tooltip(
+            message: "Settings",
+            child: InkWell(
+              onTap: () async {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const AppSettingsScreen(),
+                  ),
+                );
+                setState(() {});
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(
+                  Icons.settings,
+                  size: 24,
+                  color: kGrayColorValue.toColor!,
                 ),
-                PopupMenuItem(
-                  onTap: () async {
-                    await AppSettings.openAppSettings(
-                      type: AppSettingsType.settings,
-                    );
-                    setState(() {});
-                  },
-                  child: const Text('System Settings'),
-                ),
-              ];
-            },
+              ),
+            ),
           ),
         ],
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    'Steps',
-                    style: Theme.of(context).textTheme.headlineLarge,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              buildStreamBuilder(
-                pedometerController.stepCountStream.map(
-                  (event) => event.steps,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      bottomNavigationBar: buildBottomNavigationBar(context),
+      body: buildCurrentTab(_bottomNavIndex),
     );
   }
 
-  Widget buildStreamBuilder(Stream<int> stepCountStream) {
-    return StreamBuilder<int>(
-      stream: stepCountStream,
-      builder: (context, snapshot) {
-        var val = snapshot.data ?? 0;
-
-        return ProgressUI(
-          currentSteps: val,
-          dailyGoal: dailyGoal,
+  Widget buildBottomNavigationBar(BuildContext context) {
+    return BottomNavigationBar(
+      items: navbarItems.asMap().keys.map((index) {
+        final e = navbarItems[index];
+        var activeParam = index == _bottomNavIndex;
+        return BottomNavigationBarItem(
+          backgroundColor: kGrayColorValue.toColor!.withOpacity(0.125),
+          icon: e.build(
+            context,
+            isActiveParam: false,
+          ),
+          activeIcon: e.build(
+            context,
+            isActiveParam: activeParam,
+          ),
+          label: e.title,
+          tooltip: e.title,
         );
-      },
+      }).toList(),
+      showSelectedLabels: false,
+      showUnselectedLabels: false,
+      currentIndex: _bottomNavIndex,
+      onTap: (index) => setState(() => _bottomNavIndex = index),
+    );
+  }
+
+  Widget buildCurrentTab(int index) {
+    switch (index) {
+      case 0:
+        return ForestTab(
+          stepCountStream: pedometerController.stepCountStream,
+          dailyGoal: pedometerController.dailyGoal,
+        );
+      case 2:
+        return StatsTab(
+          stepCountStream: pedometerController.stepCountStream,
+          dailyGoal: pedometerController.dailyGoal,
+        );
+      case 1:
+      default:
+        return StepsTab(
+          stepCountStream: pedometerController.stepCountStream,
+          dailyGoal: pedometerController.dailyGoal,
+        );
+    }
+  }
+}
+
+class NavBarEntry {
+  final String title;
+  final IconData iconData;
+
+  final IconData? activeIconData;
+  final bool isActive;
+
+  NavBarEntry({
+    required this.title,
+    required this.iconData,
+    this.isActive = true,
+    this.activeIconData,
+  });
+
+  Widget build(BuildContext context, {bool? isActiveParam}) {
+    var active = isActiveParam ?? isActive;
+    return Tooltip(
+      message: title,
+      child: Icon(
+        (active ? (activeIconData ?? iconData) : iconData),
+        size: active ? 32 : 24,
+        color: active ? kPrimaryColorValue.toColor! : kGrayColorValue.toColor!,
+      ),
     );
   }
 }

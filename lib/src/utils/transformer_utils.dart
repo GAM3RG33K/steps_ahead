@@ -2,13 +2,60 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
-String formatDate(DateTime d) {
-  return d.toIso8601String();
-}
+import 'logs_utils.dart';
 
 String getPrettyJSONString(jsonObject) {
   const encoder = JsonEncoder.withIndent("     ");
   return encoder.convert(jsonObject);
+}
+
+extension StringDateExtenstion on String? {
+  DateTime? get toDateTime {
+    final dateString = this;
+    if (dateString == null) return null;
+
+    try {
+      final _dateTime = DateTime.tryParse(dateString);
+      return _dateTime;
+    } catch (e, s) {
+      Log.e(error: e, stackTrace: s, message: "toDateTime : ");
+    }
+    return null;
+  }
+}
+
+extension StringDateTimeExtenstion on DateTime? {
+  DateTime? get toDate {
+    final dateTime = this;
+    if (dateTime == null) return null;
+
+    try {
+      return DateTime(
+        dateTime.year,
+        dateTime.month,
+        dateTime.day,
+      );
+    } catch (e, s) {
+      Log.e(error: e, stackTrace: s, message: "toDate : ");
+    }
+    return null;
+  }
+
+  String? get toDateString {
+    final dateTime = this;
+    if (dateTime == null) return null;
+
+    try {
+      final _string = dateTime.toIso8601String();
+      if (_string.isEmpty) {
+        return null;
+      }
+      return _string.split("T")[0];
+    } catch (e, s) {
+      Log.e(error: e, stackTrace: s, message: "toDateString : ");
+    }
+    return null;
+  }
 }
 
 extension StringColorExtenstion on String? {
