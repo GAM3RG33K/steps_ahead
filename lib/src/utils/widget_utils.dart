@@ -16,7 +16,7 @@ Future<String?> getInputFromUser({
   String? message,
   String? hint,
   TextInputType keyboardType = TextInputType.text,
-  bool Function(String? value)? validator,
+  bool Function(String? input)? validator,
 }) async {
   TextEditingController controller = TextEditingController(text: message);
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:steps_ahead/constants.dart';
+import 'package:steps_ahead/src/screens/progress/progress_additional_information.dart';
 import 'package:steps_ahead/src/screens/screens.dart';
 import 'package:steps_ahead/src/utils/utils.dart';
 
@@ -54,8 +55,11 @@ class _ProgressUIState extends State<ProgressUI> {
         ),
         const SizedBox(height: 24),
         CustomProgressWidget(
-          currentSteps: widget.currentSteps,
-          dailyGoal: widget.dailyGoal,
+          progress: ((widget.currentSteps * 100) ~/ widget.dailyGoal),
+        ),
+        const SizedBox(height: 24),
+        ProgressAdditionalInformation(
+          steps: widget.currentSteps,
         ),
       ],
     );

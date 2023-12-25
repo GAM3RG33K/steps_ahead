@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:steps_ahead/constants.dart';
 import 'package:steps_ahead/src/controllers/controllers.dart';
 import 'package:steps_ahead/src/utils/utils.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class AppSettingsScreen extends StatefulWidget {
   const AppSettingsScreen({super.key});
@@ -12,13 +13,8 @@ class AppSettingsScreen extends StatefulWidget {
 }
 
 class _AppSettingsScreenState extends State<AppSettingsScreen> {
-  int dailyGoal = kSettingsDefaultDailyGoal;
-
   @override
   void initState() {
-    dailyGoal =
-        pedometerController.storage.getSettingInt(kSettingsKeyDailyGoal) ??
-            kSettingsDefaultDailyGoal;
     super.initState();
   }
 
@@ -45,27 +41,128 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
             buildTitle("Goals"),
             buildSettingTile(
               title: "Daily Goal",
-              subtitle: dailyGoal.toString(),
+              subtitle: pedometerController.dailyGoal.toString(),
               onClick: () async {
                 final input = await getInputFromUser(
                   context: context,
                   title: "Daily Goal",
-                  message: dailyGoal.toString(),
+                  message: pedometerController.dailyGoal.toString(),
                   keyboardType: TextInputType.number,
                 );
                 setState(() {
                   final number = num.tryParse(input ?? '')?.toInt();
                   if (number != null) {
-                    dailyGoal = number;
-                    pedometerController.storage.setSettingInt(
-                      kSettingsKeyDailyGoal,
-                      dailyGoal,
-                    );
+                    pedometerController.dailyGoal = number;
                   }
                 });
               },
             ),
             buildSeparator(),
+            buildTitle("Advanced"),
+            buildSettingTile(
+              title: "Height in cm",
+              subtitle: pedometerController.userHeightInCms.toString(),
+              onClick: () async {
+                final input = await getInputFromUser(
+                  context: context,
+                  title: "Height in cm",
+                  message: pedometerController.userHeightInCms.toString(),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  validator: (input) {
+                    final number = num.tryParse(input ?? '')?.toInt();
+                    if (number != null && number > 0 || !(number!.isInfinite)) {
+                      return true;
+                    }
+                    return false;
+                  },
+                );
+                setState(() {
+                  final number = num.tryParse(input ?? '')?.toInt();
+                  if (number != null) {
+                    pedometerController.userHeightInCms = number;
+                  }
+                });
+              },
+            ),
+            buildSettingTile(
+              title: "Weight in kg",
+              subtitle: pedometerController.userWeightInKgs.toString(),
+              onClick: () async {
+                final input = await getInputFromUser(
+                  context: context,
+                  title: "Weight in kg",
+                  message: pedometerController.userWeightInKgs.toString(),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  validator: (input) {
+                    final number = num.tryParse(input ?? '')?.toDouble();
+                    if (number != null && number > 0 || !(number!.isInfinite)) {
+                      return true;
+                    }
+                    return false;
+                  },
+                );
+                setState(() {
+                  final number = num.tryParse(input ?? '')?.toDouble();
+                  if (number != null) {
+                    pedometerController.userWeightInKgs = number;
+                  }
+                });
+              },
+            ),
+            buildSettingTile(
+              title: "Step length in cm",
+              subtitle: pedometerController.stepLength.toString(),
+              onClick: () async {
+                final input = await getInputFromUser(
+                  context: context,
+                  title: "Step length in cm",
+                  message: pedometerController.stepLength.toString(),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  validator: (input) {
+                    final number = num.tryParse(input ?? '')?.toDouble();
+                    if (number != null && number > 0 || !(number!.isInfinite)) {
+                      return true;
+                    }
+                    return false;
+                  },
+                );
+                setState(() {
+                  final number = num.tryParse(input ?? '')?.toDouble();
+                  if (number != null) {
+                    pedometerController.stepLength = number;
+                  }
+                });
+              },
+            ),
+            buildSettingTile(
+              title: "BMI - ${pedometerController.userBMI.toStringAsFixed(2)}",
+              subtitle:
+                  "\nBMI stands for Body Mass Index. It's a measurement tool used to estimate the amount of body fat you have based on your height and weight.*",
+              isEnabled: false,
+            ),
+            buildSettingTile(
+              title:
+                  "MET Value - ${pedometerController.userMET.toStringAsFixed(2)}",
+              subtitle:
+                  "\nThe Metabolic Equivalent of Task (MET) concept assigns values to activities based on their intensity relative to resting metabolic rate.*",
+              isEnabled: false,
+            ),
+            buildSeparator(),
+            buildTitle("About"),
+            buildSettingTile(
+              title: "Github",
+              subtitle:
+                  "Checkout the app's source code. File issues or suggestions here to improve this app",
+              onClick: () async {
+                var canLaunch = await canLaunchUrlString(kAppRepositoryUrl);
+                if (canLaunch) {
+                  launchUrlString(kAppRepositoryUrl);
+                }
+              },
+            ),
           ],
         ),
       ),
@@ -76,28 +173,34 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-        color: kPrimaryColorValue.toColor!,
-      ),
+            color: kPrimaryColorValue.toColor!,
+          ),
     );
   }
 
   Widget buildSettingTile({
     required String title,
     String? subtitle,
-    required VoidCallback onClick,
+    VoidCallback? onClick,
+    bool isEnabled = true,
   }) {
-    return ListTile(
-      title: Text(
-        title,
-        style: Theme.of(context).textTheme.bodyMedium,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListTile(
+        enabled: isEnabled,
+        dense: true,
+        title: Text(
+          title,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        subtitle: subtitle != null
+            ? Text(
+                subtitle,
+                style: Theme.of(context).textTheme.bodySmall,
+              )
+            : null,
+        onTap: onClick,
       ),
-      subtitle: subtitle != null
-          ? Text(
-        subtitle,
-        style: Theme.of(context).textTheme.bodySmall,
-      )
-          : null,
-      onTap: onClick,
     );
   }
 

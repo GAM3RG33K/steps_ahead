@@ -80,22 +80,6 @@ class PedometerController {
         instance.stepCountStreamController.sink.add(newSteps);
       },
     ).onError(onStepCountError);
-
-    // // update steps
-    // final lastSensorOutput = (await Pedometer.stepCountStream.last);
-    // onStepCount(lastSensorOutput);
-    // final newSteps = instance.getUpdatedCurrentSteps(lastSensorOutput);
-    // instance.stepCountStreamController.sink.add(newSteps);
-
-    // // update status
-    // final lastSensorStatus = (await Pedometer.pedestrianStatusStream.last);
-    // onPedestrianStatusChanged(lastSensorStatus);
-    // instance.pedestrianStatusStreamController.sink.add(
-    //   PedestrianStatusData.fromNativeData(
-    //     type: lastSensorStatus.status,
-    //     timestamp: lastSensorStatus.timeStamp,
-    //   ),
-    // );
   }
 
   Future<void> onAppLifecycleStateChange(AppLifecycleState state) async {
@@ -121,8 +105,103 @@ class PedometerController {
     }
   }
 
-  int get dailyGoal =>
-      storage.getSettingInt(kSettingsKeyDailyGoal) ?? kSettingsDefaultDailyGoal;
+  int get dailyGoal => dailyGoalFromStorage ?? kSettingsDefaultDailyGoal;
+
+  int? get dailyGoalFromStorage => storage.getSettingInt(kSettingsKeyDailyGoal);
+
+  set dailyGoal(int goal) => storage.setSettingInt(
+        kSettingsKeyDailyGoal,
+        goal,
+      );
+
+  int get userHeightInCms =>
+      heightInCmsFromStorage ?? kSettingsDefaultHeightInCms;
+
+  int? get heightInCmsFromStorage =>
+      storage.getSettingInt(kSettingsKeyHeightInCms);
+
+  set userHeightInCms(int height) => storage.setSettingInt(
+        kSettingsKeyHeightInCms,
+        height,
+      );
+
+  double get userWeightInKgs =>
+      weightInKgsFromStorage ?? kSettingsDefaultWeightInKGs;
+
+  double? get weightInKgsFromStorage =>
+      storage.getSettingDouble(kSettingsKeyWeightInKGs);
+
+  set userWeightInKgs(double weight) => storage.setSettingDouble(
+        kSettingsKeyWeightInKGs,
+        weight,
+      );
+
+  double get stepLength => stepLengthFromStorage ?? avgStepLength;
+
+  double? get stepLengthFromStorage =>
+      storage.getSettingDouble(kSettingsKeyStepLengthInCms);
+
+  set stepLength(double stepLength) {
+    storage.setSettingDouble(kSettingsKeyWeightInKGs, stepLength);
+  }
+
+  double get avgStepLength {
+    if (heightInCmsFromStorage == null) {
+      return double.nan;
+    }
+    double stepLength = calculateAvgStepLength(userHeightInCms);
+    return stepLength;
+  }
+
+  double calculateAvgStepLength(int userHeightInCms) {
+    final stepLength = userHeightInCms * kAverageMultiplierForStepLength;
+    return stepLength;
+  }
+
+  double get userBMI {
+    if (heightInCmsFromStorage == null || weightInKgsFromStorage == null) {
+      return double.nan;
+    }
+    double bmi = calculateBMI(userHeightInCms, userWeightInKgs);
+    return bmi;
+  }
+
+  double calculateBMI(int userHeightInCms, double userWeightInKgs) {
+    final userHeightInMeters = (userHeightInCms / 100);
+    final bmi = userWeightInKgs / (userHeightInMeters * userHeightInMeters);
+    return bmi;
+  }
+
+  double get userMET {
+    if (userBMI.isNaN) {
+      return double.nan;
+    }
+    double metVal = calculateMETValue(
+      userHeightInCms,
+      userWeightInKgs,
+      bmi: userBMI,
+    );
+    return metVal;
+  }
+
+  double calculateMETValue(int userHeightInCms, double userWeightInKgs,
+      {double? bmi}) {
+    bmi ??= userBMI;
+
+    // weight in kgs * 0.0022
+    final metWeightPart = (userWeightInKgs * kMetConstantA);
+
+    // height in cms * 0.000155
+    final metHeightPart = (userHeightInCms * kMetConstantB);
+
+    // bmi * 0.000063
+    final metBmiPart = (bmi * kMetConstantC);
+
+    // MET value = a * weight + b * height - c * BMI
+    final metValue = metWeightPart + metHeightPart - metBmiPart;
+
+    return metValue;
+  }
 
   StepData get todayStepData =>
       getStepDataFromDateTime(DateTime.now().toDateString!) ??

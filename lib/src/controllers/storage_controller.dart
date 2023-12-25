@@ -68,4 +68,6 @@ class StorageController {
 
   Future<bool> setSettingStringList(String key, List<String> val) =>
       storage.setStringList(key, val);
+
+  Future<bool> remove(String key) => storage.remove(key);
 }

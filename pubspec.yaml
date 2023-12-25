@@ -1,6 +1,7 @@
 name: steps_ahead
 version: 0.0.1+1
 publish_to: none
+repository: https://github.com/GAM3RG33K/steps_ahead
 description: 'Steps Ahead - Motivating Steps: Personal Footsteps, Fitness Tracker (SAFT)'
 environment:
   sdk: '>=3.2.3 <4.0.0'
@@ -13,6 +14,7 @@ dependencies:
   pedometer: ^4.0.1
   permission_handler: ^11.1.0
   shared_preferences: ^2.2.2
+  url_launcher: ^6.2.2
   flutter:
     sdk: flutter
 dev_dependencies:
