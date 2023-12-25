@@ -21,47 +21,51 @@ class ProgressUI extends StatefulWidget {
 class _ProgressUIState extends State<ProgressUI> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              widget.currentSteps.toString(),
-              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    fontSize: 36,
-                    color: kPrimaryColorValue.toColor!,
-                  ),
-            ),
-            const SizedBox(width: 16),
-            Text(
-              "/",
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(width: 16),
-            Text(
-              widget.dailyGoal.toString(),
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        LinearProgressIndicator(
-          value: widget.currentSteps / widget.dailyGoal,
-          borderRadius: BorderRadius.circular(10),
-          color: kPrimaryColorValue.toColor!,
-          backgroundColor: kGrayColorValue.toColor!,
-        ),
-        const SizedBox(height: 24),
-        CustomProgressWidget(
-          progress: ((widget.currentSteps * 100) ~/ widget.dailyGoal),
-        ),
-        const SizedBox(height: 24),
-        ProgressAdditionalInformation(
-          steps: widget.currentSteps,
-        ),
-      ],
+    return SingleChildScrollView(
+      physics: const ClampingScrollPhysics(),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                widget.currentSteps.toString(),
+                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                      fontSize: 36,
+                      color: kPrimaryColorValue.toColor!,
+                    ),
+              ),
+              const SizedBox(width: 16),
+              Text(
+                "/",
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(width: 16),
+              Text(
+                widget.dailyGoal.toString(),
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          LinearProgressIndicator(
+            value: widget.currentSteps / widget.dailyGoal,
+            borderRadius: BorderRadius.circular(10),
+            color: kPrimaryColorValue.toColor!,
+            backgroundColor: kGrayColorValue.toColor!,
+          ),
+          const SizedBox(height: 24),
+          CustomProgressWidget(
+            progress: ((widget.currentSteps * 100) ~/ widget.dailyGoal),
+          ),
+          const SizedBox(height: 24),
+          ProgressAdditionalInformation(
+            steps: widget.currentSteps,
+            goal: widget.dailyGoal,
+          ),
+        ],
+      ),
     );
   }
 }

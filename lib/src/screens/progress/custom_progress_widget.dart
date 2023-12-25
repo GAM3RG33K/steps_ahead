@@ -17,8 +17,8 @@ class CustomProgressWidget extends StatelessWidget {
     return Center(
       child: Image.asset(
         assetPath,
-        height: 200,
-        width: 200,
+        height: 300,
+        width: 300,
       ),
     );
   }

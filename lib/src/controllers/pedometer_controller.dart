@@ -56,7 +56,7 @@ class PedometerController {
     if (status.isDenied) {
       showToast(
         "Please allow the permission to access your movements from the app settings",
-        showlonger: true,
+        showLonger: true,
       );
     }
 
@@ -142,7 +142,7 @@ class PedometerController {
       storage.getSettingDouble(kSettingsKeyStepLengthInCms);
 
   set stepLength(double stepLength) {
-    storage.setSettingDouble(kSettingsKeyWeightInKGs, stepLength);
+    storage.setSettingDouble(kSettingsKeyStepLengthInCms, stepLength);
   }
 
   double get avgStepLength {
@@ -158,6 +158,18 @@ class PedometerController {
     return stepLength;
   }
 
+  JSON get speed => speedInformationMap[speedIndex]!;
+
+  int get speedIndex => speedIndexFromStorage ?? kSettingsDefaultSpeedIndex;
+
+  int? get speedIndexFromStorage =>
+      storage.getSettingInt(kSettingsKeySpeedIndex);
+
+  set speedIndex(int index) => storage.setSettingInt(
+        kSettingsKeySpeedIndex,
+        index,
+      );
+
   double get userBMI {
     if (heightInCmsFromStorage == null || weightInKgsFromStorage == null) {
       return double.nan;
@@ -172,35 +184,58 @@ class PedometerController {
     return bmi;
   }
 
-  double get userMET {
-    if (userBMI.isNaN) {
+  double get userMETValue =>
+      (speedInformationMap[speedIndex]!["met"] as double?) ??
+      kSettingsDefaultMetValue;
+
+  double distanceTravelledFromSteps(int stepCount) {
+    if (stepLength.isNaN) {
       return double.nan;
     }
-    double metVal = calculateMETValue(
-      userHeightInCms,
-      userWeightInKgs,
-      bmi: userBMI,
+    final distanceTravelled = calculateDistanceTravelledInKm(
+      stepCount,
+      stepLength,
     );
-    return metVal;
+    return distanceTravelled;
   }
 
-  double calculateMETValue(int userHeightInCms, double userWeightInKgs,
-      {double? bmi}) {
-    bmi ??= userBMI;
+  double calculateDistanceTravelledInCm(int stepCount, double stepLength) {
+    final totalDistance = stepCount * stepLength;
+    return totalDistance;
+  }
 
-    // weight in kgs * 0.0022
-    final metWeightPart = (userWeightInKgs * kMetConstantA);
+  double calculateDistanceTravelledInKm(int stepCount, double stepLength) {
+    final totalDistanceInCm =
+        calculateDistanceTravelledInCm(stepCount, stepLength);
+    final totalDistanceInKm = totalDistanceInCm / 100000;
+    return totalDistanceInKm;
+  }
 
-    // height in cms * 0.000155
-    final metHeightPart = (userHeightInCms * kMetConstantB);
+  double calculateCaloriesBurnedFromSteps(int stepCount) {
+    if (userMETValue.isNaN) {
+      return double.nan;
+    }
 
-    // bmi * 0.000063
-    final metBmiPart = (bmi * kMetConstantC);
+    final distanceFromSteps = distanceTravelledFromSteps(stepCount);
+    final activityDurationInHours = calculateActivityDurationInHours(
+      distanceFromSteps,
+      (speed["value"] as double),
+    );
+    double caloriesBurned = calculateCaloriesBurned(
+      activityDurationInHours,
+      userMETValue,
+      userWeightInKgs,
+    );
+    return caloriesBurned;
+  }
 
-    // MET value = a * weight + b * height - c * BMI
-    final metValue = metWeightPart + metHeightPart - metBmiPart;
-
-    return metValue;
+  double calculateCaloriesBurned(
+    double activityDurationInHours,
+    double metValue,
+    double weightInKgs,
+  ) {
+    final caloriesBurned = (metValue * weightInKgs * activityDurationInHours);
+    return caloriesBurned;
   }
 
   StepData get todayStepData =>
@@ -246,6 +281,11 @@ class PedometerController {
       date,
       jsonEncode(data.toJson()),
     );
+  }
+
+  double calculateActivityDurationInHours(double distance, double speed) {
+    final durationInHours = distance / speed;
+    return durationInHours;
   }
 }
 

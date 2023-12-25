@@ -3,11 +3,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 Future<bool?> showToast(
   String message, {
-  bool showlonger = false,
+  bool showLonger = false,
 }) {
   return Fluttertoast.showToast(
       msg: message,
-      toastLength: showlonger ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
+      toastLength: showLonger ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
 }
 
 Future<String?> getInputFromUser({

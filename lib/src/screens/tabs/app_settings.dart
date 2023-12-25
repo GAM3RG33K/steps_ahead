@@ -59,6 +59,27 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
             ),
             buildSeparator(),
             buildTitle("Advanced"),
+            buildDropdownSettingTile<int>(
+              title: "Speed",
+              items: speedInformationMap.keys.map(
+                (index) {
+                  final e = speedInformationMap[index]!;
+                  return DropdownMenuItem<int>(
+                    value: index,
+                    child: Text(
+                      e["title"],
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  );
+                },
+              ).toList(),
+              onChange: (value) {
+                if (value == null) return;
+                pedometerController.speedIndex = value;
+                setState(() {});
+              },
+              defaultValue: pedometerController.speedIndex,
+            ),
             buildSettingTile(
               title: "Height in cm",
               subtitle: pedometerController.userHeightInCms.toString(),
@@ -140,14 +161,14 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
             buildSettingTile(
               title: "BMI - ${pedometerController.userBMI.toStringAsFixed(2)}",
               subtitle:
-                  "\nBMI stands for Body Mass Index. It's a measurement tool used to estimate the amount of body fat you have based on your height and weight.*",
+                  "Body Mass Index, It's a measurement tool used to estimate the amount of body fat.*",
               isEnabled: false,
             ),
             buildSettingTile(
               title:
-                  "MET Value - ${pedometerController.userMET.toStringAsFixed(2)}",
+                  "MET Value - ${pedometerController.userMETValue.toStringAsFixed(2)}",
               subtitle:
-                  "\nThe Metabolic Equivalent of Task (MET) concept assigns values to activities based on their intensity relative to resting metabolic rate.*",
+                  "Metabolic Equivalent of Task (MET) concept assigns values to activities based on their intensity relative to resting metabolic rate.*",
               isEnabled: false,
             ),
             buildSeparator(),
@@ -194,12 +215,48 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         subtitle: subtitle != null
+            ? Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  subtitle,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              )
+            : null,
+        onTap: onClick,
+      ),
+    );
+  }
+
+  Widget buildDropdownSettingTile<T>({
+    required String title,
+    String? subtitle,
+    required List<DropdownMenuItem<T>> items,
+    required ValueChanged<T?> onChange,
+    T? defaultValue,
+    bool isEnabled = true,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListTile(
+        enabled: isEnabled,
+        dense: true,
+        title: Text(
+          title,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        subtitle: subtitle != null
             ? Text(
                 subtitle,
                 style: Theme.of(context).textTheme.bodySmall,
               )
             : null,
-        onTap: onClick,
+        trailing: DropdownButton<T>(
+          items: items,
+          onChanged: onChange,
+          value: defaultValue,
+          isDense: true,
+        ),
       ),
     );
   }
