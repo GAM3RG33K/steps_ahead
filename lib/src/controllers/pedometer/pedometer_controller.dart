@@ -32,27 +32,45 @@ class PedometerController extends PedometerApi {
       );
     }
 
-    Pedometer.pedestrianStatusStream.listen(
-      (event) {
-        onPedestrianStatusChanged(event);
-        pedestrianStatusStreamController.sink.add(
-          PedestrianStatusData.fromNativeData(
-            type: event.status,
-            timestamp: event.timeStamp,
-          ),
-        );
-      },
-    ).onError(onPedestrianStatusError);
+    Pedometer.pedestrianStatusStream
+        .listen(
+          (event) => onPedestrianStatusChanged(event),
+        )
+        .onError(onPedestrianStatusError);
 
-    Pedometer.stepCountStream.listen(
-      (event) {
-        onStepCount(event);
-        final newSteps = getUpdatedCurrentSteps(event);
-        todayStepData = newSteps;
-        stepCountStreamController.sink.add(newSteps);
-        _currentSteps = newSteps.steps;
-      },
-    ).onError(onStepCountError);
+    Pedometer.stepCountStream
+        .listen((event) => onStepCount(event))
+        .onError(onStepCountError);
+  }
+
+  void onStepCount(StepCount event) {
+    Log.d(message: "onStepCount : $event");
+    final newSteps = getUpdatedCurrentSteps(event);
+    todayStepData = newSteps;
+    stepCountStreamController.sink.add(newSteps);
+    _currentSteps = newSteps.steps;
+
+    if (_currentSteps >= dailyGoal) {
+      setGoalAchieved();
+    }
+  }
+
+  void onPedestrianStatusChanged(PedestrianStatus event) {
+    Log.d(message: "onPedestrianStatusChanged : $event");
+    pedestrianStatusStreamController.sink.add(
+      PedestrianStatusData.fromNativeData(
+        type: event.status,
+        timestamp: event.timeStamp,
+      ),
+    );
+  }
+
+  void onPedestrianStatusError(e) {
+    Log.e(error: e, message: "onPedestrianStatusError : ");
+  }
+
+  void onStepCountError(e) {
+    Log.e(error: e, message: "onStepCountError : ");
   }
 
   @override
@@ -62,7 +80,7 @@ class PedometerController extends PedometerApi {
     // These are the callbacks
     switch (state) {
       case AppLifecycleState.resumed:
-      // widget is resumed
+        // widget is resumed
         break;
       case AppLifecycleState.inactive:
       // widget is inactive
@@ -81,20 +99,4 @@ class PedometerController extends PedometerApi {
 
   @override
   int get currentSteps => _currentSteps;
-}
-
-void onStepCount(StepCount event) {
-  Log.d(message: "onStepCount : $event");
-}
-
-void onPedestrianStatusChanged(PedestrianStatus event) {
-  Log.d(message: "onPedestrianStatusChanged : $event");
-}
-
-void onPedestrianStatusError(e) {
-  Log.e(error: e, message: "onPedestrianStatusError : ");
-}
-
-void onStepCountError(e) {
-  Log.e(error: e, message: "onStepCountError : ");
 }

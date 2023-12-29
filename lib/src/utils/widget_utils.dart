@@ -58,3 +58,46 @@ Future<String?> getInputFromUser({
     },
   );
 }
+
+Widget buildInfoTile({
+  required BuildContext context,
+  required String title,
+  required IconData icon,
+  required Color tileColor,
+  required Color iconColor,
+  String? subtitle,
+  EdgeInsets padding = const EdgeInsets.all(8.0),
+}) {
+  return Padding(
+    padding: padding,
+    child: Card(
+      color: tileColor,
+      child: ListTile(
+        enabled: false,
+        dense: true,
+        leading: CircleAvatar(
+          backgroundColor: iconColor,
+          child: Icon(
+            icon,
+            size: 24,
+            color: tileColor,
+          ),
+        ),
+        title: Text(
+          title,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: iconColor,
+              ),
+        ),
+        subtitle: subtitle != null
+            ? Text(
+                subtitle,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: iconColor,
+                    ),
+              )
+            : null,
+      ),
+    ),
+  );
+}

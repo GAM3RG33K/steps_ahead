@@ -30,13 +30,15 @@ class StorageController {
       // widget is paused
         break;
       case AppLifecycleState.detached:
-      // widget is detached
+        // widget is detached
         break;
       case AppLifecycleState.hidden:
-      // widget is not visible
+        // widget is not visible
         break;
     }
   }
+
+  Set<String> getKeys() => storage.getKeys();
 
   Object? getSetting(String key) => storage.get(key);
 

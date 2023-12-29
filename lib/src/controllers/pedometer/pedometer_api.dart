@@ -232,12 +232,22 @@ abstract class PedometerApi {
     return newSteps;
   }
 
+  void setGoalAchieved() {
+    todayStepData = todayStepData.copyWith(
+      goalAchieved: true,
+    );
+  }
+
   StepData? getStepDataFromDateTime(DateTime date) {
     if (date.toDateString == DateTime.now().toDateString) {
       return StepData.fromCount(currentSteps);
     }
     final dateString = date.toDateString!;
-    final jsonString = storage.getSettingString(dateString);
+    return getStepDataFromKey(getStorageKeyFromDate(dateString));
+  }
+
+  StepData? getStepDataFromKey(String key) {
+    final jsonString = storage.getSettingString(key);
     if (jsonString == null || jsonString.isEmpty) {
       return null;
     }
@@ -263,12 +273,23 @@ abstract class PedometerApi {
     return data;
   }
 
+  List<StepData> getAllStepData() {
+    final keys = storage.getKeys();
+    final data = keys
+        .where((key) => key.startsWith(kStepDataPrefix))
+        .map((key) => getStepDataFromKey(key)!)
+        .toList();
+    return data;
+  }
+
   Future<bool>? setStepDataFromDateTime(String date, StepData data) {
     return storage.setSettingString(
-      date,
+      getStorageKeyFromDate(date),
       jsonEncode(data.toJson()),
     );
   }
+
+  String getStorageKeyFromDate(String date) => kStepDataPrefix + date;
 
   double calculateActivityDurationInHours(double distance, double speed) {
     final durationInHours = distance / speed;

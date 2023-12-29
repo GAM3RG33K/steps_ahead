@@ -1,5 +1,7 @@
 const kAppRepositoryUrl = "https://github.com/GAM3RG33K/steps_ahead";
 
+const kStepDataPrefix = "StepData_";
+
 // Color values used inside the app
 const kGrayColorValue = "#FFE6E2D9";
 const kCyanColorValue = "#FF4EE0FD";

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:steps_ahead/src/controllers/controllers.dart';
 import 'package:steps_ahead/src/screens/screens.dart';
 
-class StatsTab extends StatelessWidget {
+class StatsTab extends StatefulWidget {
   final Stream<StepData> stepCountStream;
   final int dailyGoal;
 
@@ -12,6 +12,11 @@ class StatsTab extends StatelessWidget {
     required this.dailyGoal,
   });
 
+  @override
+  State<StatsTab> createState() => _StatsTabState();
+}
+
+class _StatsTabState extends State<StatsTab> {
   List<String> get tabs => ["Details", "Summary"];
 
   @override
@@ -33,10 +38,10 @@ class StatsTab extends StatelessWidget {
               tabs: tabs
                   .map(
                     (e) => Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(e),
-                    ),
-                  )
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(e),
+                ),
+              )
                   .toList(),
             ),
           ),

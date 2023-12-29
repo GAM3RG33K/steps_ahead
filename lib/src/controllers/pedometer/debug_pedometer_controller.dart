@@ -47,9 +47,11 @@ class DebugPedometerController extends PedometerApi {
     if (date.toDateString == DateTime.now().toDateString) {
       return StepData.fromCount(currentSteps);
     }
+    var stepCount = Random().nextInt(6000) + 2500;
     final stepData = StepData(
-      steps: Random().nextInt(6000) + 2500,
+      steps: stepCount,
       lastUpdateTimeStamp: date,
+      goalAchieved: stepCount > 5000,
     );
     return stepData;
   }
@@ -70,4 +72,16 @@ class DebugPedometerController extends PedometerApi {
 
   @override
   int get currentSteps => stepCount;
+
+  @override
+  List<StepData> getAllStepData() {
+    final endDate = DateTime.now().toDate!;
+    final startDate = endDate.subtract(const Duration(days: 30)).toDate!;
+
+    final data = getStepDataForDateRange(
+      startDateTime: startDate,
+      endDateTime: endDate,
+    );
+    return data;
+  }
 }

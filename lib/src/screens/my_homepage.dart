@@ -111,17 +111,20 @@ class _MyHomePageState extends State<MyHomePage> {
     switch (index) {
       case 0:
         return ForestTab(
+          key: const ValueKey(0),
           stepCountStream: countStream,
           dailyGoal: dailyGoal,
         );
       case 2:
         return StatsTab(
+          key: const ValueKey(2),
           stepCountStream: countStream,
           dailyGoal: dailyGoal,
         );
       case 1:
       default:
         return StepsTab(
+          key: const ValueKey(1),
           stepCountStream: countStream,
           dailyGoal: dailyGoal,
         );

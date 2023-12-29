@@ -3,10 +3,12 @@ import 'package:steps_ahead/src/utils/utils.dart';
 class StepData {
   final DateTime lastUpdateTimeStamp;
   final int steps;
+  final bool goalAchieved;
 
   StepData({
     required this.lastUpdateTimeStamp,
     required this.steps,
+    this.goalAchieved = false,
   });
 
   factory StepData.fromCount(int stepsCount) {
@@ -43,6 +45,18 @@ class StepData {
     return StepData(
       lastUpdateTimeStamp: DateTime.now(),
       steps: this.steps + steps,
+    );
+  }
+
+  StepData copyWith({
+    DateTime? timeStamp,
+    int? steps,
+    bool? goalAchieved,
+  }) {
+    return StepData(
+      lastUpdateTimeStamp: timeStamp ?? lastUpdateTimeStamp,
+      steps: steps ?? this.steps,
+      goalAchieved: goalAchieved ?? this.goalAchieved,
     );
   }
 }

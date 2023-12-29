@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:steps_ahead/src/controllers/controllers.dart';
 import 'package:steps_ahead/src/screens/screens.dart';
 
-class StepsTab extends StatelessWidget {
+class StepsTab extends StatefulWidget {
   final Stream<StepData> stepCountStream;
   final int dailyGoal;
 
@@ -12,6 +12,11 @@ class StepsTab extends StatelessWidget {
     required this.dailyGoal,
   });
 
+  @override
+  State<StepsTab> createState() => _StepsTabState();
+}
+
+class _StepsTabState extends State<StepsTab> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -35,7 +40,7 @@ class StepsTab extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             buildStreamBuilder(
-              stepCountStream.map(
+              widget.stepCountStream.map(
                 (event) => event.steps,
               ),
             ),
@@ -53,7 +58,7 @@ class StepsTab extends StatelessWidget {
 
         return ProgressUI(
           currentSteps: val,
-          dailyGoal: dailyGoal,
+          dailyGoal: widget.dailyGoal,
         );
       },
     );

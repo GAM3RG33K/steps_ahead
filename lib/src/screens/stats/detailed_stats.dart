@@ -4,7 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:steps_ahead/constants.dart';
 import 'package:steps_ahead/src/controllers/controllers.dart';
-import 'package:steps_ahead/src/utils/transformer_utils.dart';
+import 'package:steps_ahead/src/utils/utils.dart';
 
 class DetailedStats extends StatefulWidget {
   const DetailedStats({super.key});
@@ -16,10 +16,13 @@ class DetailedStats extends StatefulWidget {
 class _DetailedStatsState extends State<DetailedStats> {
   List<StepData> stepsData = [];
 
+  StepData? currentStep;
+
   @override
   void initState() {
     super.initState();
     stepsData = getStepDataForChart();
+    currentStep = stepsData.last;
   }
 
   List<StepData> getStepDataForChart() {
@@ -42,8 +45,7 @@ class _DetailedStatsState extends State<DetailedStats> {
             BarChartGroupData group,
             int groupIndex,
             BarChartRodData rod,
-            int rodIndex,
-          ) {
+            int rodIndex,) {
             return BarTooltipItem(
               rod.toY.round().toString(),
               TextStyle(
@@ -53,6 +55,14 @@ class _DetailedStatsState extends State<DetailedStats> {
             );
           },
         ),
+    touchCallback: (p0, p1) {
+      final index = p1?.spot?.touchedBarGroup.x;
+      if (index != null) {
+        setState(() {
+          currentStep = stepsData[index];
+        });
+      }
+    },
       );
 
   Widget getTitles(StepData value, TitleMeta meta) {
@@ -95,24 +105,39 @@ class _DetailedStatsState extends State<DetailedStats> {
         show: false,
       );
 
-  LinearGradient get _barsGradient => LinearGradient(
-        colors: [
-          kDarkBlueColorValue.toColor!,
-          kCyanColorValue.toColor!,
-        ],
-        begin: Alignment.bottomCenter,
-        end: Alignment.topCenter,
-      );
+  LinearGradient getBarsGradient({
+    bool isSelected = false,
+  }) {
+    var barColors = [
+      kDarkBlueColorValue.toColor!,
+      kCyanColorValue.toColor!,
+    ];
+
+    if (isSelected) {
+      barColors = [
+        kDarkBlueColorValue.toColor!,
+        kDarkBlueColorValue.toColor!,
+      ];
+    }
+
+    return LinearGradient(
+      colors: barColors,
+      begin: Alignment.bottomCenter,
+      end: Alignment.topCenter,
+    );
+  }
 
   List<BarChartGroupData> getBarGroups(List<StepData> data) =>
       data.asMap().keys.map((e) {
+        var stepData = stepsData[e];
         return BarChartGroupData(
           x: e,
           barRods: [
             BarChartRodData(
-              toY: stepsData[e].steps.toDouble(),
-              gradient: _barsGradient,
-              width: 24,
+              toY: stepData.steps.toDouble(),
+              gradient: getBarsGradient(isSelected: stepData == currentStep),
+              width: 32,
+              borderRadius: BorderRadius.circular(2),
             )
           ],
           showingTooltipIndicators: [0],
@@ -130,8 +155,9 @@ class _DetailedStatsState extends State<DetailedStats> {
   @override
   Widget build(BuildContext context) {
     return ListView(
+      physics: const ClampingScrollPhysics(),
       children: [
-        const SizedBox(height: 24),
+        const SizedBox(height: 36),
         SizedBox(
           height: 400,
           child: (stepsData.isNotEmpty)
@@ -142,6 +168,26 @@ class _DetailedStatsState extends State<DetailedStats> {
                   barGroups: getBarGroups(stepsData),
                   gridData: const FlGridData(show: false),
                   alignment: BarChartAlignment.spaceAround,
+                  extraLinesData: ExtraLinesData(
+                    horizontalLines: [
+                      HorizontalLine(
+                        y: PedometerApi.instance.dailyGoal.toDouble(),
+                        strokeWidth: 1,
+                        dashArray: [8, 4],
+                        gradient: getBarsGradient(
+                          isSelected: true,
+                        ),
+                        color: kGrayColorValue.toColor!,
+                        label: HorizontalLineLabel(
+                          show: true,
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: kDarkBlueColorValue.toColor!,
+                                  ),
+                        ),
+                      ),
+                    ],
+                  ),
                   maxY: maxY,
                 ))
               : const Expanded(
@@ -150,6 +196,38 @@ class _DetailedStatsState extends State<DetailedStats> {
                   ),
                 ),
         ),
+        if (currentStep != null) ...[
+          buildInfoTile(
+            context: context,
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            title:
+                "${PedometerApi.instance.calculateCaloriesBurnedFromSteps(currentStep!.steps).toStringAsFixed(2)} kcal",
+            subtitle: "Calories Burned",
+            icon: Icons.local_fire_department,
+            iconColor: materialColor1,
+            tileColor: materialColorLight1,
+          ),
+          buildInfoTile(
+            context: context,
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            title:
+                "${PedometerApi.instance.distanceTravelledFromSteps(currentStep!.steps).toStringAsFixed(2)} km",
+            subtitle: "Distance Travelled",
+            icon: Icons.route,
+            iconColor: materialColor4,
+            tileColor: materialColorLight4,
+          ),
+          if (currentStep!.goalAchieved)
+            buildInfoTile(
+              context: context,
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              title: "Tree collected",
+              subtitle: "You have met your goal",
+              icon: Icons.electric_bolt,
+              iconColor: materialColor2,
+              tileColor: materialColorLight2,
+            ),
+        ]
       ],
     );
   }
