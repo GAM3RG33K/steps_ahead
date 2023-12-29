@@ -41,18 +41,18 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
             buildTitle("Goals"),
             buildSettingTile(
               title: "Daily Goal",
-              subtitle: pedometerController.dailyGoal.toString(),
+              subtitle: PedometerApi.instance.dailyGoal.toString(),
               onClick: () async {
                 final input = await getInputFromUser(
                   context: context,
                   title: "Daily Goal",
-                  message: pedometerController.dailyGoal.toString(),
+                  message: PedometerApi.instance.dailyGoal.toString(),
                   keyboardType: TextInputType.number,
                 );
                 setState(() {
                   final number = num.tryParse(input ?? '')?.toInt();
                   if (number != null) {
-                    pedometerController.dailyGoal = number;
+                    PedometerApi.instance.dailyGoal = number;
                   }
                 });
               },
@@ -75,19 +75,19 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
               ).toList(),
               onChange: (value) {
                 if (value == null) return;
-                pedometerController.speedIndex = value;
+                PedometerApi.instance.speedIndex = value;
                 setState(() {});
               },
-              defaultValue: pedometerController.speedIndex,
+              defaultValue: PedometerApi.instance.speedIndex,
             ),
             buildSettingTile(
               title: "Height in cm",
-              subtitle: pedometerController.userHeightInCms.toString(),
+              subtitle: PedometerApi.instance.userHeightInCms.toString(),
               onClick: () async {
                 final input = await getInputFromUser(
                   context: context,
                   title: "Height in cm",
-                  message: pedometerController.userHeightInCms.toString(),
+                  message: PedometerApi.instance.userHeightInCms.toString(),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
                   validator: (input) {
@@ -101,19 +101,19 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                 setState(() {
                   final number = num.tryParse(input ?? '')?.toInt();
                   if (number != null) {
-                    pedometerController.userHeightInCms = number;
+                    PedometerApi.instance.userHeightInCms = number;
                   }
                 });
               },
             ),
             buildSettingTile(
               title: "Weight in kg",
-              subtitle: pedometerController.userWeightInKgs.toString(),
+              subtitle: PedometerApi.instance.userWeightInKgs.toString(),
               onClick: () async {
                 final input = await getInputFromUser(
                   context: context,
                   title: "Weight in kg",
-                  message: pedometerController.userWeightInKgs.toString(),
+                  message: PedometerApi.instance.userWeightInKgs.toString(),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
                   validator: (input) {
@@ -127,19 +127,19 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                 setState(() {
                   final number = num.tryParse(input ?? '')?.toDouble();
                   if (number != null) {
-                    pedometerController.userWeightInKgs = number;
+                    PedometerApi.instance.userWeightInKgs = number;
                   }
                 });
               },
             ),
             buildSettingTile(
               title: "Step length in cm",
-              subtitle: pedometerController.stepLength.toString(),
+              subtitle: PedometerApi.instance.stepLength.toString(),
               onClick: () async {
                 final input = await getInputFromUser(
                   context: context,
                   title: "Step length in cm",
-                  message: pedometerController.stepLength.toString(),
+                  message: PedometerApi.instance.stepLength.toString(),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
                   validator: (input) {
@@ -153,20 +153,21 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                 setState(() {
                   final number = num.tryParse(input ?? '')?.toDouble();
                   if (number != null) {
-                    pedometerController.stepLength = number;
+                    PedometerApi.instance.stepLength = number;
                   }
                 });
               },
             ),
             buildSettingTile(
-              title: "BMI - ${pedometerController.userBMI.toStringAsFixed(2)}",
+              title:
+                  "BMI - ${PedometerApi.instance.userBMI.toStringAsFixed(2)}",
               subtitle:
                   "Body Mass Index, It's a measurement tool used to estimate the amount of body fat.*",
               isEnabled: false,
             ),
             buildSettingTile(
               title:
-                  "MET Value - ${pedometerController.userMETValue.toStringAsFixed(2)}",
+                  "MET Value - ${PedometerApi.instance.userMETValue.toStringAsFixed(2)}",
               subtitle:
                   "Metabolic Equivalent of Task (MET) concept assigns values to activities based on their intensity relative to resting metabolic rate.*",
               isEnabled: false,

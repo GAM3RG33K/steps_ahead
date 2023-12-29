@@ -2,24 +2,19 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:shared_preferences/shared_preferences.dart';
-
-StorageController get storageController => StorageController._instance!;
+import 'package:steps_ahead/src/utils/di_utils.dart';
 
 class StorageController {
+  static StorageController get instance => get<StorageController>();
   final SharedPreferences storage;
 
-  StorageController._(this.storage);
+  StorageController(this.storage);
 
-  static StorageController? _instance;
-
-  static bool get isInitialized => _instance != null;
+  bool isInitialized = false;
 
   static Future<StorageController> getInstance() async {
-    if (!isInitialized) {
-      final storage = await SharedPreferences.getInstance();
-      _instance = StorageController._(storage);
-    }
-    return _instance!;
+    final prefs = await SharedPreferences.getInstance();
+    return StorageController(prefs);
   }
 
   Future<void> onAppLifecycleStateChange(AppLifecycleState state) async {
@@ -29,16 +24,16 @@ class StorageController {
         // widget is resumed
         break;
       case AppLifecycleState.inactive:
-        // widget is inactive
+      // widget is inactive
         break;
       case AppLifecycleState.paused:
-        // widget is paused
+      // widget is paused
         break;
       case AppLifecycleState.detached:
-        // widget is detached
+      // widget is detached
         break;
       case AppLifecycleState.hidden:
-        // widget is not visible
+      // widget is not visible
         break;
     }
   }

@@ -1,14 +1,16 @@
 name: steps_ahead
 version: 0.0.1+1
 publish_to: none
-repository: https://github.com/GAM3RG33K/steps_ahead
 description: 'Steps Ahead - Motivating Steps: Personal Footsteps, Fitness Tracker (SAFT)'
+repository: https://github.com/GAM3RG33K/steps_ahead
 environment:
   sdk: '>=3.2.3 <4.0.0'
 dependencies:
   app_settings: ^5.1.1
   cupertino_icons: ^1.0.6
+  fl_chart: ^0.66.0
   fluttertoast: ^8.2.4
+  get_it: ^7.6.4
   google_fonts: ^6.1.0
   lottie: ^2.7.0
   pedometer: ^4.0.1

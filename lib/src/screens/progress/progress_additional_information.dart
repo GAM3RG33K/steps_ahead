@@ -23,7 +23,7 @@ class ProgressAdditionalInformation extends StatelessWidget {
           buildInfoTile(
             context: context,
             title:
-                "${pedometerController.calculateCaloriesBurnedFromSteps(steps).toStringAsFixed(2)} kcal",
+                "${PedometerApi.instance.calculateCaloriesBurnedFromSteps(steps).toStringAsFixed(2)} kcal",
             subtitle: "Calories Burned",
             icon: Icons.local_fire_department,
             iconColor: materialColor1,
@@ -32,7 +32,7 @@ class ProgressAdditionalInformation extends StatelessWidget {
           buildInfoTile(
             context: context,
             title:
-                "${pedometerController.distanceTravelledFromSteps(steps).toStringAsFixed(2)} km",
+                "${PedometerApi.instance.distanceTravelledFromSteps(steps).toStringAsFixed(2)} km",
             subtitle: "Distance Travelled",
             icon: Icons.route,
             iconColor: materialColor4,
@@ -40,7 +40,7 @@ class ProgressAdditionalInformation extends StatelessWidget {
           ),
           buildInfoTile(
             context: context,
-            title: "${(steps * 100 / goal)}%",
+            title: "${(steps * 100 / goal).toStringAsFixed(2)}%",
             subtitle: "Goal achieved",
             icon: Icons.location_on,
             iconColor: materialColor2,

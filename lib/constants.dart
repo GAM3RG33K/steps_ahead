@@ -2,6 +2,8 @@ const kAppRepositoryUrl = "https://github.com/GAM3RG33K/steps_ahead";
 
 // Color values used inside the app
 const kGrayColorValue = "#FFE6E2D9";
+const kCyanColorValue = "#FF4EE0FD";
+const kDarkBlueColorValue = "#FF1B7BC3";
 const kPrimaryColorValue = "#FF216E2F";
 
 const kProjectName = "Steps Ahead";
@@ -19,6 +21,7 @@ const kSettingsKeyWeightInKGs = "user_weight";
 const kSettingsDefaultWeightInKGs = 60.0;
 
 const kSettingsKeyStepLengthInCms = "step_length";
+const kAverageDefaultStepLength = 68.0;
 const kAverageMultiplierForStepLength = 1 / 2.5;
 
 const kSettingsKeySpeedIndex = "speed_index";

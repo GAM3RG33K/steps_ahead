@@ -11,7 +11,9 @@ import 'package:steps_ahead/src/utils/transformer_utils.dart';
 void main() async {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
-    await PedometerController.getInstance();
+
+    await PedometerApi.registerForDI();
+
     runApp(const MyApp());
   }, (error, stackTrace) {
     Log.e(
@@ -44,7 +46,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    pedometerController.onAppLifecycleStateChange(state);
+    PedometerApi.instance.onAppLifecycleStateChange(state);
   }
 
   @override

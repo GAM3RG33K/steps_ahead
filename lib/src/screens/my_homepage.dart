@@ -106,22 +106,24 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget buildCurrentTab(int index) {
+    var countStream = PedometerApi.instance.stepCountStream;
+    var dailyGoal = PedometerApi.instance.dailyGoal;
     switch (index) {
       case 0:
         return ForestTab(
-          stepCountStream: pedometerController.stepCountStream,
-          dailyGoal: pedometerController.dailyGoal,
+          stepCountStream: countStream,
+          dailyGoal: dailyGoal,
         );
       case 2:
         return StatsTab(
-          stepCountStream: pedometerController.stepCountStream,
-          dailyGoal: pedometerController.dailyGoal,
+          stepCountStream: countStream,
+          dailyGoal: dailyGoal,
         );
       case 1:
       default:
         return StepsTab(
-          stepCountStream: pedometerController.stepCountStream,
-          dailyGoal: pedometerController.dailyGoal,
+          stepCountStream: countStream,
+          dailyGoal: dailyGoal,
         );
     }
   }

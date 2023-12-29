@@ -12,45 +12,54 @@ class StatsTab extends StatelessWidget {
     required this.dailyGoal,
   });
 
+  List<String> get tabs => ["Details", "Summary"];
+
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return DefaultTabController(
+      length: tabs.length,
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  'Stats',
-                  style: Theme.of(context).textTheme.headlineLarge,
-                ),
-              ],
+        padding: const EdgeInsets.symmetric(
+          horizontal: 24,
+          vertical: 12,
+        ),
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              'Stats',
+              style: Theme.of(context).textTheme.headlineLarge,
             ),
-            const SizedBox(height: 16),
-            buildStreamBuilder(
-              stepCountStream.map(
-                (event) => event.steps,
-              ),
+            bottom: TabBar(
+              tabs: tabs
+                  .map(
+                    (e) => Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(e),
+                    ),
+                  )
+                  .toList(),
             ),
-          ],
+          ),
+          body: TabBarView(
+            children: tabs.map((e) {
+              return _buildTab(e);
+            }).toList(),
+          ),
         ),
       ),
     );
   }
 
-  Widget buildStreamBuilder(Stream<int> stepCountStream) {
-    return StreamBuilder<int>(
-      stream: stepCountStream,
-      builder: (context, snapshot) {
-        var val = snapshot.data ?? 0;
-
-        return ProgressUI(
-          currentSteps: val,
-          dailyGoal: dailyGoal,
-        );
+  Widget _buildTab(String tabName) {
+    return Builder(
+      builder: (context) {
+        switch (tabName) {
+          case "Summary":
+            return const SummaryStats();
+          case "Details":
+          default:
+            return const DetailedStats();
+        }
       },
     );
   }
