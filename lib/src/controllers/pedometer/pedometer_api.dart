@@ -113,12 +113,10 @@ abstract class PedometerApi {
     if (heightInCmsFromStorage == null) {
       return kAverageDefaultStepLength;
     }
-    double stepLength = calculateAvgStepLength(userHeightInCms);
-    return stepLength;
-  }
-
-  double calculateAvgStepLength(int userHeightInCms) {
-    final stepLength = userHeightInCms * kAverageMultiplierForStepLength;
+    double stepLength = FormulaUtils.instance.calculateAvgStepLength(
+      userHeightInCms,
+      kAverageMultiplierForStepLength,
+    );
     return stepLength;
   }
 
@@ -138,13 +136,8 @@ abstract class PedometerApi {
     if (heightInCmsFromStorage == null || weightInKgsFromStorage == null) {
       return double.nan;
     }
-    double bmi = calculateBMI(userHeightInCms, userWeightInKgs);
-    return bmi;
-  }
-
-  double calculateBMI(int userHeightInCms, double userWeightInKgs) {
-    final userHeightInMeters = (userHeightInCms / 100);
-    final bmi = userWeightInKgs / (userHeightInMeters * userHeightInMeters);
+    double bmi =
+        FormulaUtils.instance.calculateBMI(userHeightInCms, userWeightInKgs);
     return bmi;
   }
 
@@ -156,23 +149,12 @@ abstract class PedometerApi {
     if (stepLength.isNaN) {
       return double.nan;
     }
-    final distanceTravelled = calculateDistanceTravelledInKm(
+    final distanceTravelled =
+        FormulaUtils.instance.calculateDistanceTravelledInKm(
       stepCount,
       stepLength,
     );
     return distanceTravelled;
-  }
-
-  double calculateDistanceTravelledInCm(int stepCount, double stepLength) {
-    final totalDistance = stepCount * stepLength;
-    return totalDistance;
-  }
-
-  double calculateDistanceTravelledInKm(int stepCount, double stepLength) {
-    final totalDistanceInCm =
-        calculateDistanceTravelledInCm(stepCount, stepLength);
-    final totalDistanceInKm = totalDistanceInCm / 100000;
-    return totalDistanceInKm;
   }
 
   double calculateCaloriesBurnedFromSteps(int stepCount) {
@@ -181,24 +163,16 @@ abstract class PedometerApi {
     }
 
     final distanceFromSteps = distanceTravelledFromSteps(stepCount);
-    final activityDurationInHours = calculateActivityDurationInHours(
+    final activityDurationInHours =
+        FormulaUtils.instance.calculateActivityDurationInHours(
       distanceFromSteps,
       (speed["value"] as double),
     );
-    double caloriesBurned = calculateCaloriesBurned(
+    double caloriesBurned = FormulaUtils.instance.calculateCaloriesBurned(
       activityDurationInHours,
       userMETValue,
       userWeightInKgs,
     );
-    return caloriesBurned;
-  }
-
-  double calculateCaloriesBurned(
-    double activityDurationInHours,
-    double metValue,
-    double weightInKgs,
-  ) {
-    final caloriesBurned = (metValue * weightInKgs * activityDurationInHours);
     return caloriesBurned;
   }
 
@@ -207,6 +181,7 @@ abstract class PedometerApi {
       StepData(
         lastUpdateTimeStamp: DateTime.now(),
         steps: 0,
+        goalAtTheTime: dailyGoal,
       );
 
   set todayStepData(StepData stepData) => setStepDataFromDateTime(
@@ -240,7 +215,7 @@ abstract class PedometerApi {
 
   StepData? getStepDataFromDateTime(DateTime date) {
     if (date.toDateString == DateTime.now().toDateString) {
-      return StepData.fromCount(currentSteps);
+      return StepData.fromCount(currentSteps, dailyGoal);
     }
     final dateString = date.toDateString!;
     return getStepDataFromKey(getStorageKeyFromDate(dateString));
@@ -290,9 +265,4 @@ abstract class PedometerApi {
   }
 
   String getStorageKeyFromDate(String date) => kStepDataPrefix + date;
-
-  double calculateActivityDurationInHours(double distance, double speed) {
-    final durationInHours = distance / speed;
-    return durationInHours;
-  }
 }

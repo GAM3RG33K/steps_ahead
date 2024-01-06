@@ -5,13 +5,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:steps_ahead/constants.dart';
 import 'package:steps_ahead/src/controllers/controllers.dart';
 import 'package:steps_ahead/src/screens/screens.dart';
-import 'package:steps_ahead/src/utils/logs_utils.dart';
-import 'package:steps_ahead/src/utils/transformer_utils.dart';
+
+import 'src/utils/utils.dart';
 
 void main() async {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
+    registerSingleton(FormulaUtils());
     await PedometerApi.registerForDI();
 
     runApp(const MyApp());

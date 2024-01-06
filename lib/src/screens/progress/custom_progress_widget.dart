@@ -5,21 +5,25 @@ import 'package:steps_ahead/constants.dart';
 
 class CustomProgressWidget extends StatelessWidget {
   final int progress;
+  final double height;
+  final double width;
+  final Color? tint;
 
   const CustomProgressWidget({
     super.key,
     required this.progress,
+    this.height = 300,
+    this.width = 300,
+    this.tint,
   });
 
   @override
   Widget build(BuildContext context) {
     final assetPath = getAssetPathFromData(progress);
-    return Center(
-      child: Image.asset(
-        assetPath,
-        height: 300,
-        width: 300,
-      ),
+    return Image.asset(
+      assetPath,
+      height: height,
+      width: width,
     );
   }
 

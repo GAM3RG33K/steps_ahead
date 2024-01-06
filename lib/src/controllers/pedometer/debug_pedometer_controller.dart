@@ -13,7 +13,10 @@ class DebugPedometerController extends PedometerApi {
       (timer) {
         stepCount += 50;
         stepCountStreamController.sink.add(
-          StepData.fromCount(stepCount),
+          StepData.fromCount(
+            stepCount,
+            dailyGoal,
+          ),
         );
       },
     );
@@ -45,13 +48,17 @@ class DebugPedometerController extends PedometerApi {
   @override
   StepData? getStepDataFromDateTime(DateTime date) {
     if (date.toDateString == DateTime.now().toDateString) {
-      return StepData.fromCount(currentSteps);
+      return StepData.fromCount(
+        currentSteps,
+        dailyGoal,
+      );
     }
     var stepCount = Random().nextInt(6000) + 2500;
     final stepData = StepData(
       steps: stepCount,
       lastUpdateTimeStamp: date,
       goalAchieved: stepCount > 5000,
+      goalAtTheTime: dailyGoal,
     );
     return stepData;
   }

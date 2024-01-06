@@ -18,7 +18,7 @@ class ProgressAdditionalInformation extends StatelessWidget {
       physics: const ClampingScrollPhysics(),
       shrinkWrap: true,
       children: [
-        buildInfoTile(
+        InfoTile(
           context: context,
           title:
               "${PedometerApi.instance.calculateCaloriesBurnedFromSteps(steps).toStringAsFixed(2)} kcal",
@@ -27,7 +27,7 @@ class ProgressAdditionalInformation extends StatelessWidget {
           iconColor: materialColor1,
           tileColor: materialColorLight1,
         ),
-        buildInfoTile(
+        InfoTile(
           context: context,
           title:
               "${PedometerApi.instance.distanceTravelledFromSteps(steps).toStringAsFixed(2)} km",
@@ -36,7 +36,7 @@ class ProgressAdditionalInformation extends StatelessWidget {
           iconColor: materialColor4,
           tileColor: materialColorLight4,
         ),
-        buildInfoTile(
+        InfoTile(
           context: context,
           title: "${(steps * 100 / goal).toStringAsFixed(2)}%",
           subtitle: "Goal achieved",

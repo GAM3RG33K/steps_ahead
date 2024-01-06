@@ -7,11 +7,13 @@ import 'package:steps_ahead/src/utils/utils.dart';
 class ProgressUI extends StatefulWidget {
   final int currentSteps;
   final int dailyGoal;
+  final bool additionalInfo;
 
   const ProgressUI({
     super.key,
     required this.currentSteps,
     required this.dailyGoal,
+    this.additionalInfo = true,
   });
 
   @override
@@ -56,14 +58,21 @@ class _ProgressUIState extends State<ProgressUI> {
             backgroundColor: kGrayColorValue.toColor!,
           ),
           const SizedBox(height: 24),
-          CustomProgressWidget(
-            progress: ((widget.currentSteps * 100) ~/ widget.dailyGoal),
+          Center(
+            child: CustomProgressWidget(
+              progress: FormulaUtils.instance.calculateProgressForStepsAndGoal(
+                currentSteps: widget.currentSteps,
+                dailyGoal: widget.dailyGoal,
+              ),
+            ),
           ),
-          const SizedBox(height: 24),
-          ProgressAdditionalInformation(
-            steps: widget.currentSteps,
-            goal: widget.dailyGoal,
-          ),
+          if (widget.additionalInfo) ...[
+            const SizedBox(height: 24),
+            ProgressAdditionalInformation(
+              steps: widget.currentSteps,
+              goal: widget.dailyGoal,
+            ),
+          ],
         ],
       ),
     );

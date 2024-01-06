@@ -197,7 +197,7 @@ class _DetailedStatsState extends State<DetailedStats> {
                 ),
         ),
         if (currentStep != null) ...[
-          buildInfoTile(
+          InfoTile(
             context: context,
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             title:
@@ -207,7 +207,7 @@ class _DetailedStatsState extends State<DetailedStats> {
             iconColor: materialColor1,
             tileColor: materialColorLight1,
           ),
-          buildInfoTile(
+          InfoTile(
             context: context,
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             title:
@@ -218,7 +218,7 @@ class _DetailedStatsState extends State<DetailedStats> {
             tileColor: materialColorLight4,
           ),
           if (currentStep!.goalAchieved)
-            buildInfoTile(
+            InfoTile(
               context: context,
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               title: "Tree collected",

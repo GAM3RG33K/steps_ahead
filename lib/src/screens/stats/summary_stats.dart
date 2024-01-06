@@ -42,7 +42,7 @@ class _SummaryStatsState extends State<SummaryStats> {
       physics: const ClampingScrollPhysics(),
       children: [
         const SizedBox(height: 36),
-        buildInfoTile(
+        InfoTile(
           context: context,
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           title: "$totalSteps Steps",
@@ -51,7 +51,7 @@ class _SummaryStatsState extends State<SummaryStats> {
           iconColor: materialColor3,
           tileColor: materialColorLight3,
         ),
-        buildInfoTile(
+        InfoTile(
           context: context,
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           title: "${totalCaloriesBurned.toStringAsFixed(2)} kcal",
@@ -60,7 +60,7 @@ class _SummaryStatsState extends State<SummaryStats> {
           iconColor: materialColor1,
           tileColor: materialColorLight1,
         ),
-        buildInfoTile(
+        InfoTile(
           context: context,
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           title: "${totalDistanceTravelled.toStringAsFixed(2)} km",
@@ -69,7 +69,7 @@ class _SummaryStatsState extends State<SummaryStats> {
           iconColor: materialColor4,
           tileColor: materialColorLight4,
         ),
-        buildInfoTile(
+        InfoTile(
           context: context,
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           title: "$totalGoalsAchieved",

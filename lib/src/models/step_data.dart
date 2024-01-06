@@ -4,17 +4,20 @@ class StepData {
   final DateTime lastUpdateTimeStamp;
   final int steps;
   final bool goalAchieved;
+  final int goalAtTheTime;
 
   StepData({
     required this.lastUpdateTimeStamp,
     required this.steps,
+    required this.goalAtTheTime,
     this.goalAchieved = false,
   });
 
-  factory StepData.fromCount(int stepsCount) {
+  factory StepData.fromCount(int stepsCount, int goalAtTheTime) {
     return StepData(
       lastUpdateTimeStamp: DateTime.now(),
       steps: stepsCount,
+      goalAtTheTime: goalAtTheTime,
     );
   }
 
@@ -23,9 +26,15 @@ class StepData {
 
   DateTime get baseDate => DateTime.parse(baseDateString);
 
+  int get progress => FormulaUtils.instance.calculateProgressForStepsAndGoal(
+        currentSteps: steps,
+        dailyGoal: goalAtTheTime,
+      );
+
   factory StepData.fromJson(JSON json) {
     return StepData(
       steps: json["steps"] ?? 0,
+      goalAtTheTime: json["goalAtTheTime"] ?? 1,
       lastUpdateTimeStamp: json["lastUpdateTimeStamp"] == null
           ? DateTime.now()
           : DateTime.fromMillisecondsSinceEpoch(
@@ -38,6 +47,7 @@ class StepData {
     return {
       "steps": steps,
       "lastUpdateTimeStamp": lastUpdateTimeStamp.millisecondsSinceEpoch,
+      "goalAtTheTime": goalAtTheTime,
     };
   }
 
@@ -45,6 +55,7 @@ class StepData {
     return StepData(
       lastUpdateTimeStamp: DateTime.now(),
       steps: this.steps + steps,
+      goalAtTheTime: goalAtTheTime,
     );
   }
 
@@ -52,11 +63,13 @@ class StepData {
     DateTime? timeStamp,
     int? steps,
     bool? goalAchieved,
+    int? goalAtTheTime,
   }) {
     return StepData(
       lastUpdateTimeStamp: timeStamp ?? lastUpdateTimeStamp,
       steps: steps ?? this.steps,
       goalAchieved: goalAchieved ?? this.goalAchieved,
+      goalAtTheTime: goalAtTheTime ?? this.goalAtTheTime,
     );
   }
 }

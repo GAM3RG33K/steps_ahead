@@ -59,45 +59,59 @@ Future<String?> getInputFromUser({
   );
 }
 
-Widget buildInfoTile({
-  required BuildContext context,
-  required String title,
-  required IconData icon,
-  required Color tileColor,
-  required Color iconColor,
-  String? subtitle,
-  EdgeInsets padding = const EdgeInsets.all(8.0),
-}) {
-  return Padding(
-    padding: padding,
-    child: Card(
-      color: tileColor,
-      child: ListTile(
-        enabled: false,
-        dense: true,
-        leading: CircleAvatar(
-          backgroundColor: iconColor,
-          child: Icon(
-            icon,
-            size: 24,
-            color: tileColor,
+class InfoTile extends StatelessWidget {
+  final BuildContext context;
+  final String title;
+  final IconData icon;
+  final Color tileColor;
+  final Color iconColor;
+  final String? subtitle;
+  final EdgeInsets padding;
+
+  const InfoTile({
+    super.key,
+    required this.context,
+    required this.title,
+    required this.icon,
+    required this.tileColor,
+    required this.iconColor,
+    this.padding = const EdgeInsets.all(8.0),
+    this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: padding,
+      child: Card(
+        color: tileColor,
+        child: ListTile(
+          enabled: false,
+          dense: true,
+          leading: CircleAvatar(
+            backgroundColor: iconColor,
+            child: Icon(
+              icon,
+              size: 24,
+              color: tileColor,
+            ),
           ),
+          title: Text(
+            title,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: iconColor,
+                ),
+          ),
+          subtitle: subtitle != null
+              ? Text(
+                  subtitle!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: iconColor,
+                      ),
+                )
+              : null,
         ),
-        title: Text(
-          title,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: iconColor,
-              ),
-        ),
-        subtitle: subtitle != null
-            ? Text(
-                subtitle,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: iconColor,
-                    ),
-              )
-            : null,
       ),
-    ),
-  );
+    );
+  }
 }
