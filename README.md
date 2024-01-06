@@ -6,8 +6,8 @@ Steps Ahead is a personal footsteps & fitness tracker (SAFT) built with Flutter,
 motivate users. This app will encourage and reward users for taking more steps, burning calories,
 and achieving their fitness goals with a very User-friendly interface.
 
-![Stars](https://img.shields.io/github/stars/GAM3RG33K/steps_ahead.svg)]
-![Forks](https://img.shields.io/github/forks/GAM3RG33K/steps_ahead.svg)]
+![Stars](https://img.shields.io/github/stars/GAM3RG33K/steps_ahead.svg)
+![Forks](https://img.shields.io/github/forks/GAM3RG33K/steps_ahead.svg)
 [![LICENSE](https://img.shields.io/github/license/GAM3RG33K/steps_ahead.svg)](https://github.com/GAM3RG33K/steps_ahead/blob/main/LICENSE)
 [![Follow](https://img.shields.io/github/followers/GAM3RG33K.svg?style=social&label=Follow&maxAge=2592000)](https://img.shields.io/github/followers/GAM3RG33K.svg?style=social&label=Follow&maxAge=2592000)
 
