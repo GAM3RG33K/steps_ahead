@@ -15,13 +15,13 @@ and achieving their fitness goals with a very User-friendly interface.
 
 - [x] Step Counting & Calorie Burn
     - The app will utilize the Pedometer API to count steps taken by the user and estimate calories
-      burned based on their BMI and activity level. Users can view their daily, weekly, or monthly
+      burned based on their BMI and activity level. Users can view their daily weekly
       step counts with caloric burn data to track progress and set goals
 
 - [x] Goal Setting & Progress Tracking
-    - Users can set walking or running goals based on their daily, weekly, monthly, or yearly
-      targets. The app will track progress towards these goals and provide insights into how to
-      optimize performance
+    - Users can set walking or running goals based on their daily target. The app will track
+      progress towards these goals and provide insights into how to
+      progressed
 
 - [x] Privacy Protection
     - Steps Ahead will prioritize user privacy and security by *NOT* sharing any of the data
@@ -32,9 +32,9 @@ and achieving their fitness goals with a very User-friendly interface.
       their goals and provide motivation throughout the day. Users can customize notification
       settings based on their preferences
 
-- [ ] Dark Mode for Night Walking
-    - Steps Ahead will offer a dark mode option for users who prefer walking during nighttime hours,
-      improving visibility and enhancing overall user experience
+- [ ] Custom Themes
+    - Steps Ahead will offer a theme option for users who prefer theme to improve visibility and
+      enhance overall user experience
 
 - [ ] Accessibility Features
     - Steps Ahead app will adhere to accessibility guidelines, ensuring that it is usable by
