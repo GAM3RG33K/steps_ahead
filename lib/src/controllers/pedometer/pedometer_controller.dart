@@ -83,7 +83,7 @@ class PedometerController extends PedometerApi {
         // widget is resumed
         break;
       case AppLifecycleState.inactive:
-      // widget is inactive
+        // widget is inactive
         break;
       case AppLifecycleState.paused:
       // widget is paused

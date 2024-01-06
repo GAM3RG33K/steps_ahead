@@ -36,8 +36,10 @@ abstract class PedometerApi {
         DebugPedometerController(storage),
       );
     }
+    final pedometerController = PedometerController(storage);
+    await pedometerController.initialize();
     return registerSingleton<PedometerController>(
-      PedometerController(storage),
+      pedometerController,
     );
   }
 
