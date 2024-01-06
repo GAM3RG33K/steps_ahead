@@ -133,9 +133,6 @@ abstract class PedometerApi {
       );
 
   double get userBMI {
-    if (heightInCmsFromStorage == null || weightInKgsFromStorage == null) {
-      return double.nan;
-    }
     double bmi =
         FormulaUtils.instance.calculateBMI(userHeightInCms, userWeightInKgs);
     return bmi;
