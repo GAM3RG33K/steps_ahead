@@ -103,6 +103,7 @@ class _ForestTabState extends State<ForestTab> {
         final stackWidth = treeSize.width;
 
         return Tooltip(
+          triggerMode: TooltipTriggerMode.tap,
           message: "${stepData.baseDateString ?? ""}"
               "\nProgress - $progress%",
           child: SizedOverflowBox(
