@@ -21,7 +21,7 @@ and achieving their fitness goals with a very User-friendly interface.
 - [x] Goal Setting & Progress Tracking
     - Users can set walking or running goals based on their daily target. The app will track
       progress towards these goals and provide insights into how to
-      progressed
+      progress
 
 - [x] Privacy Protection
     - Steps Ahead will prioritize user privacy and security by *NOT* sharing any of the data
