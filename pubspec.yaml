@@ -9,8 +9,9 @@ dependencies:
   app_settings: ^5.1.1
   cupertino_icons: ^1.0.6
   fl_chart: ^0.66.0
+  flutter_local_notifications: ^16.3.0
   fluttertoast: ^8.2.4
-  get_it: ^7.6.4
+  get_it: ^7.6.6
   google_fonts: ^6.1.0
   lottie: ^2.7.0
   pedometer: ^4.0.1

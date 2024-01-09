@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:steps_ahead/constants.dart';
 import 'package:steps_ahead/src/controllers/controllers.dart';
@@ -12,8 +13,7 @@ void main() async {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
-    registerSingleton(FormulaUtils());
-    await PedometerApi.registerForDI();
+    await registerDependencies();
 
     runApp(const MyApp());
   }, (error, stackTrace) {
@@ -22,6 +22,17 @@ void main() async {
         stackTrace: stackTrace,
         message: "main: runZonedGuarded : ");
   });
+}
+
+Future<void> registerDependencies() async {
+  registerSingleton(FormulaUtils());
+  final notificationController = NotificationController(
+    FlutterLocalNotificationsPlugin(),
+  );
+  await notificationController.initialize();
+  registerSingleton(notificationController);
+
+  await PedometerApi.registerForDI();
 }
 
 class MyApp extends StatefulWidget {

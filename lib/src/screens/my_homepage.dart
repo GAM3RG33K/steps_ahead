@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:steps_ahead/constants.dart';
 import 'package:steps_ahead/src/controllers/controllers.dart';
 import 'package:steps_ahead/src/screens/screens.dart';
+import 'package:steps_ahead/src/utils/formula_utils.dart';
 import 'package:steps_ahead/src/utils/transformer_utils.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -37,6 +38,29 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    PedometerApi.instance.stepCountStream.listen((event) {
+      final pedometerApi = PedometerApi.instance;
+      final goal = pedometerApi.dailyGoal;
+      final steps = pedometerApi.todayStepData.steps;
+
+      final calories = pedometerApi.calculateCaloriesBurnedFromSteps(steps);
+      final distanceTravelled = pedometerApi.distanceTravelledFromSteps(steps);
+      final progress = FormulaUtils.instance.calculateProgressForStepsAndGoal(
+        currentSteps: steps,
+        dailyGoal: goal,
+      );
+      final notificationController = NotificationController.instance;
+      final bodyTextCalorie = "${calories.toStringAsFixed(2)} kcal";
+      final bodyTextDistance = "${distanceTravelled.toStringAsFixed(2)} Kms";
+      final bodyTextProgress =
+          "${progress.toStringAsFixed(2)}% of your daily goal";
+      final bodyText = "$bodyTextCalorie $bodyTextDistance $bodyTextProgress";
+      notificationController.showNotificationWithId(
+        id: notificationController.stepCounterId,
+        title: "$steps steps today",
+        body: bodyText,
+      );
+    });
   }
 
   @override
