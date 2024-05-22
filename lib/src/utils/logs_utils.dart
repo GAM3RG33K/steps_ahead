@@ -29,14 +29,14 @@ class Log {
   }) {
     tag ??= _defaultLogTag;
 
-    String _message = message ?? '';
+    String message0 = message ?? '';
     if (error != null) {
-      _message += '\n------> E: ${error.toString()}';
+      message0 += '\n------> E: ${error.toString()}';
     }
     if (stackTrace != null) {
-      _message += '\n------> S: $stackTrace';
+      message0 += '\n------> S: $stackTrace';
     }
-    log('ERROR ------> $tag:\t$_message');
+    log('ERROR ------> $tag:\t$message0');
   }
 
   static String get _defaultLogTag {
