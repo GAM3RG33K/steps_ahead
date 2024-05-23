@@ -61,7 +61,8 @@ abstract class PedometerApi {
 
   bool isInitialized = false;
 
-  Future<void> initialize();
+  Future<void> initialize() =>
+      throw UnimplementedError('initialize Not implemented Yet');
 
   @mustCallSuper
   void dispose() {
@@ -69,7 +70,11 @@ abstract class PedometerApi {
     pedestrianStatusStreamController.close();
   }
 
-  Future<void> onAppLifecycleStateChange(AppLifecycleState state);
+  Future<void> onAppLifecycleStateChange(
+    AppLifecycleState state, {
+    Future<void> Function(AppLifecycleState state)? processState,
+  }) =>
+      throw UnimplementedError('onAppLifecycleStateChange Not implemented Yet');
 
   int get dailyGoal => dailyGoalFromStorage ?? kSettingsDefaultDailyGoal;
 

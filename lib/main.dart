@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:steps_ahead/constants.dart';
 import 'package:steps_ahead/src/controllers/controllers.dart';
+import 'package:steps_ahead/src/controllers/notifications/app_forground_service_controller.dart';
 import 'package:steps_ahead/src/screens/screens.dart';
 
 import 'src/utils/utils.dart';
@@ -26,11 +28,15 @@ void main() async {
 
 Future<void> registerDependencies() async {
   registerSingleton(FormulaUtils());
-  final notificationController = NotificationController(
+  final notificationController = AppNotificationController(
     FlutterLocalNotificationsPlugin(),
   );
   await notificationController.initialize();
   registerSingleton(notificationController);
+
+  final foregroundServiceController = AppForegroundServiceController();
+  await foregroundServiceController.initialize();
+  registerSingleton(foregroundServiceController);
 
   await PedometerApi.registerForDI();
 }
@@ -58,7 +64,20 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    PedometerApi.instance.onAppLifecycleStateChange(state);
+    PedometerApi.instance.onAppLifecycleStateChange(
+      state,
+      processState: (state) async {
+        if (state == AppLifecycleState.paused) {
+          final steps = PedometerApi.instance.currentSteps;
+          final notificationTitle = "$steps steps till now";
+          const notificationText = "Click here to get real-time updates";
+          AppForegroundServiceController.instance.updateForegroundTask(
+            notificationTitle: notificationTitle,
+            notificationText: notificationText,
+          );
+        }
+      },
+    );
   }
 
   @override
@@ -67,7 +86,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       debugShowCheckedModeBanner: false,
       title: kProjectName,
       theme: buildThemeData(),
-      home: const SplashScreen(),
+      home: const WithForegroundTask(child: SplashScreen()),
     );
   }
 

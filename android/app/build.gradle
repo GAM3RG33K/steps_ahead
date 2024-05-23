@@ -30,7 +30,7 @@ if (flutterVersionName == null) {
 android {
     namespace "com.happydevworks.steps_ahead"
     compileSdk 34
-    ndkVersion flutter.ndkVersion
+    ndkVersion "23.1.7779620"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -64,7 +64,6 @@ android {
         multiDexEnabled true
     }
 
-    ndkVersion "23.1.7779620"
     buildTypes {
         release {
             shrinkResources true

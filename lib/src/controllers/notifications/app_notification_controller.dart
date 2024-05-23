@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:steps_ahead/constants.dart';
 import 'package:steps_ahead/src/utils/utils.dart';
 
-class NotificationController {
-  static NotificationController get instance => get<NotificationController>();
+class AppNotificationController {
+  static AppNotificationController get instance =>
+      get<AppNotificationController>();
   final FlutterLocalNotificationsPlugin notificationsPlugin;
 
   NotificationDetails? _androidNotificationDetails;
@@ -28,13 +30,13 @@ class NotificationController {
   int notificationIdCounter = 7 * 31;
   int stepCounterId = 24769;
 
-  NotificationController(this.notificationsPlugin);
+  AppNotificationController(this.notificationsPlugin);
 
   NotificationDetails get androidNotificationDetails {
     if (_androidNotificationDetails == null) {
       AndroidNotificationDetails androidPlatformChannelSpecifics =
           AndroidNotificationDetails(
-        'com.happydevworks.steps_ahead',
+        "$kPackageId.notifications",
         'Steps Ahead Notifications',
         channelDescription:
             'Notifications raised by Steps ahead app containing '
@@ -88,7 +90,7 @@ class NotificationController {
     }
 
     const initializationSettingsAndroid = AndroidInitializationSettings(
-      'logo_transparent',
+      'img_logo_transparent',
     );
 
     const initializationSettingsIOS = DarwinInitializationSettings(
@@ -109,6 +111,44 @@ class NotificationController {
           onDidReceiveNotificationResponseCallback,
       onDidReceiveBackgroundNotificationResponse:
           onDidReceiveBackgroundNotificationResponseCallback,
+    );
+
+    initializeForegroundService();
+  }
+
+  void initializeForegroundService() {
+    FlutterForegroundTask.init(
+      androidNotificationOptions: AndroidNotificationOptions(
+        foregroundServiceType: AndroidForegroundServiceType.HEALTH,
+        channelId: '$kPackageId.tracker_updates',
+        channelName: 'Tracker update Notification',
+        channelDescription:
+            'This notification appears when app is running & is tracking the walking activity',
+        channelImportance: NotificationChannelImportance.MAX,
+        priority: NotificationPriority.MAX,
+        iconData: const NotificationIconData(
+          resType: ResourceType.mipmap,
+          resPrefix: ResourcePrefix.ic,
+          name: 'launcher',
+        ),
+        isSticky: true,
+        playSound: false,
+        // buttons: [
+        //   const NotificationButton(id: 'sendButton', text: 'Send'),
+        //   const NotificationButton(id: 'testButton', text: 'Test'),
+        // ],
+      ),
+      iosNotificationOptions: const IOSNotificationOptions(
+        showNotification: true,
+        playSound: false,
+      ),
+      foregroundTaskOptions: const ForegroundTaskOptions(
+        interval: 5000,
+        isOnceEvent: false,
+        autoRunOnBoot: false,
+        allowWakeLock: true,
+        allowWifiLock: true,
+      ),
     );
   }
 
