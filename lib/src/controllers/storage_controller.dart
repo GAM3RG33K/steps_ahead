@@ -17,17 +17,20 @@ class StorageController {
     return StorageController(prefs);
   }
 
-  Future<void> onAppLifecycleStateChange(AppLifecycleState state) async {
+  Future<void> onAppLifecycleStateChange(
+    AppLifecycleState state, {
+    Future<void> Function(AppLifecycleState state)? processState,
+  }) async {
     // These are the callbacks
     switch (state) {
       case AppLifecycleState.resumed:
         // widget is resumed
         break;
       case AppLifecycleState.inactive:
-      // widget is inactive
+        // widget is inactive
         break;
       case AppLifecycleState.paused:
-      // widget is paused
+        // widget is paused
         break;
       case AppLifecycleState.detached:
         // widget is detached

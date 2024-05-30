@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:steps_ahead/constants.dart';
 import 'package:steps_ahead/src/controllers/controllers.dart';
+import 'package:steps_ahead/src/controllers/notifications/app_forground_service_controller.dart';
 import 'package:steps_ahead/src/screens/screens.dart';
 import 'package:steps_ahead/src/utils/formula_utils.dart';
 import 'package:steps_ahead/src/utils/transformer_utils.dart';
@@ -49,18 +50,34 @@ class _MyHomePageState extends State<MyHomePage> {
         currentSteps: steps,
         dailyGoal: goal,
       );
-      final notificationController = NotificationController.instance;
+
       final bodyTextCalorie = "${calories.toStringAsFixed(2)} kcal";
       final bodyTextDistance = "${distanceTravelled.toStringAsFixed(2)} Kms";
       final bodyTextProgress =
           "${progress.toStringAsFixed(2)}% of your daily goal";
       final bodyText = "$bodyTextCalorie $bodyTextDistance $bodyTextProgress";
-      notificationController.showNotificationWithId(
-        id: notificationController.stepCounterId,
-        title: "$steps steps today",
-        body: bodyText,
-      );
+      updateNotification(steps, bodyText);
     });
+  }
+
+  Future<void> updateNotification(int steps, String bodyText) async {
+    final appForegroundServiceController =
+        AppForegroundServiceController.instance;
+
+    final notificationTitle = "$steps steps today";
+    final notificationText = bodyText;
+
+    if (!(await appForegroundServiceController.isRunningService)) {
+      await appForegroundServiceController.startForegroundTask(
+        notificationText: notificationText,
+        notificationTitle: notificationTitle,
+      );
+    } else {
+      await appForegroundServiceController.updateForegroundTask(
+        notificationTitle: notificationTitle,
+        notificationText: notificationText,
+      );
+    }
   }
 
   @override

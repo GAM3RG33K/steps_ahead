@@ -104,7 +104,7 @@ class _ForestTabState extends State<ForestTab> {
 
         return Tooltip(
           triggerMode: TooltipTriggerMode.tap,
-          message: "${stepData.baseDateString ?? ""}"
+          message: "${stepData.baseDateString}"
               "\nProgress - $progress%",
           child: SizedOverflowBox(
             size: cellSize,

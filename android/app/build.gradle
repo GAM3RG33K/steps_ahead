@@ -29,8 +29,8 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.happydevworks.steps_ahead"
-    compileSdkVersion 34
-    ndkVersion flutter.ndkVersion
+    compileSdk 34
+    ndkVersion "23.1.7779620"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -72,6 +72,9 @@ android {
         debug {
             shrinkResources false
             minifyEnabled false
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
         }
     }
 

@@ -15,8 +15,8 @@ extension StringDateExtenstion on String? {
     if (dateString == null) return null;
 
     try {
-      final _dateTime = DateTime.tryParse(dateString);
-      return _dateTime;
+      final dateTime = DateTime.tryParse(dateString);
+      return dateTime;
     } catch (e, s) {
       Log.e(error: e, stackTrace: s, message: "toDateTime : ");
     }
@@ -46,11 +46,11 @@ extension StringDateTimeExtenstion on DateTime? {
     if (dateTime == null) return null;
 
     try {
-      final _string = dateTime.toIso8601String();
-      if (_string.isEmpty) {
+      final string = dateTime.toIso8601String();
+      if (string.isEmpty) {
         return null;
       }
-      return _string.split("T")[0];
+      return string.split("T")[0];
     } catch (e, s) {
       Log.e(error: e, stackTrace: s, message: "toDateString : ");
     }

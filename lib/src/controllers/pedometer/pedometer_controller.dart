@@ -74,9 +74,13 @@ class PedometerController extends PedometerApi {
   }
 
   @override
-  Future<void> onAppLifecycleStateChange(AppLifecycleState state) async {
+  Future<void> onAppLifecycleStateChange(
+    AppLifecycleState state, {
+    Future<void> Function(AppLifecycleState state)? processState,
+  }) async {
     storage.onAppLifecycleStateChange(state);
 
+    Log.d(message: "PedometerController.onAppLifecycleStateChange : $state");
     // These are the callbacks
     switch (state) {
       case AppLifecycleState.resumed:
@@ -86,7 +90,7 @@ class PedometerController extends PedometerApi {
         // widget is inactive
         break;
       case AppLifecycleState.paused:
-      // widget is paused
+        // widget is paused
         break;
       case AppLifecycleState.detached:
         // widget is detached
@@ -95,6 +99,8 @@ class PedometerController extends PedometerApi {
         // widget is not visible
         break;
     }
+
+    processState?.call(state);
   }
 
   @override
