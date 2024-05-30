@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:pedometer/pedometer.dart';
 import 'package:steps_ahead/src/utils/utils.dart';
 
 import 'pedometer_api.dart';
@@ -116,5 +117,20 @@ class DebugPedometerController extends PedometerApi {
     }
 
     processState?.call(state);
+  }
+
+  @override
+  void onPedestrianStatusChanged(PedestrianStatus event) {
+    // TODO: implement onPedestrianStatusChanged
+  }
+
+  @override
+  void onStepCount(int steps, DateTime timestamp) {
+    // TODO: implement onStepCount
+  }
+
+  @override
+  void setupInitialSteps() {
+    // TODO: implement setupInitialSteps
   }
 }

@@ -7,11 +7,13 @@ import 'package:steps_ahead/src/utils/utils.dart';
 class ForestTab extends StatefulWidget {
   final Stream<StepData> stepCountStream;
   final int dailyGoal;
+  final int initialSteps;
 
   const ForestTab({
     super.key,
     required this.stepCountStream,
     required this.dailyGoal,
+    this.initialSteps = 0,
   });
 
   @override
@@ -66,6 +68,7 @@ class _ForestTabState extends State<ForestTab> {
             widget.stepCountStream.map(
               (event) => event.steps,
             ),
+            initialSteps: widget.initialSteps,
           ),
           const Flexible(
             fit: FlexFit.loose,
@@ -151,8 +154,10 @@ class _ForestTabState extends State<ForestTab> {
     return multiplier;
   }
 
-  Widget buildStreamBuilder(Stream<int> stepCountStream) {
+  Widget buildStreamBuilder(Stream<int> stepCountStream,
+      {int initialSteps = 0}) {
     return StreamBuilder<int>(
+      initialData: initialSteps,
       stream: stepCountStream,
       builder: (context, snapshot) {
         var val = snapshot.data ?? 0;

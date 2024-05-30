@@ -75,6 +75,19 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             notificationTitle: notificationTitle,
             notificationText: notificationText,
           );
+        } else if (state == AppLifecycleState.resumed) {
+          var steps = PedometerApi.instance.currentSteps;
+          if (steps == 0) {
+            steps = PedometerApi.instance.lastSensorOutputFromStorage;
+          }
+
+          final foregroundService = AppForegroundServiceController.instance;
+          final bodyText = foregroundService.generateNotificationData(
+            PedometerApi.instance,
+            steps,
+            PedometerApi.instance.dailyGoal,
+          );
+          foregroundService.updateNotification(steps, bodyText);
         }
       },
     );

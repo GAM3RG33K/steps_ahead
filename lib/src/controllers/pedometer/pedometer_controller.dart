@@ -19,6 +19,8 @@ class PedometerController extends PedometerApi {
   Future<void> initialize() async {
     if (!isInitialized) {
       await _initPedometerStreams();
+
+      setupInitialSteps();
       isInitialized = true;
     }
   }
@@ -39,13 +41,30 @@ class PedometerController extends PedometerApi {
         .onError(onPedestrianStatusError);
 
     Pedometer.stepCountStream
-        .listen((event) => onStepCount(event))
+        .listen((event) => onStepCount(event.steps, event.timeStamp))
         .onError(onStepCountError);
   }
 
-  void onStepCount(StepCount event) {
-    Log.d(message: "onStepCount : $event");
-    final newSteps = getUpdatedCurrentSteps(event);
+  @override
+  void setupInitialSteps() {
+    Log.d(message: "setupInitialSteps :");
+
+    final newSteps = todayStepData.steps > 0
+        ? todayStepData
+        : todayStepData.addSteps(lastSensorOutputFromStorage);
+
+    stepCountStreamController.sink.add(newSteps);
+    _currentSteps = newSteps.steps;
+
+    if (_currentSteps >= dailyGoal) {
+      setGoalAchieved();
+    }
+  }
+
+  @override
+  void onStepCount(int steps, DateTime timestamp) {
+    Log.d(message: "onStepCount : steps: $steps, ts: $timestamp");
+    final newSteps = getUpdatedCurrentSteps(steps);
     todayStepData = newSteps;
     stepCountStreamController.sink.add(newSteps);
     _currentSteps = newSteps.steps;
@@ -55,6 +74,7 @@ class PedometerController extends PedometerApi {
     }
   }
 
+  @override
   void onPedestrianStatusChanged(PedestrianStatus event) {
     Log.d(message: "onPedestrianStatusChanged : $event");
     pedestrianStatusStreamController.sink.add(

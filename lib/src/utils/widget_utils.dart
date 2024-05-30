@@ -75,7 +75,7 @@ class InfoTile extends StatelessWidget {
     required this.icon,
     required this.tileColor,
     required this.iconColor,
-    this.padding = const EdgeInsets.all(8.0),
+    this.padding = const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
     this.subtitle,
   });
 

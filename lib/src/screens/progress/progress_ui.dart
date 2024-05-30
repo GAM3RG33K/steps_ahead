@@ -38,26 +38,26 @@ class _ProgressUIState extends State<ProgressUI> {
                       color: kPrimaryColorValue.toColor!,
                     ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Text(
                 "/",
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Text(
                 widget.dailyGoal.toString(),
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           LinearProgressIndicator(
             value: widget.currentSteps / widget.dailyGoal,
             borderRadius: BorderRadius.circular(10),
             color: kPrimaryColorValue.toColor!,
             backgroundColor: kGrayColorValue.toColor!,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           Center(
             child: CustomProgressWidget(
               progress: FormulaUtils.instance.calculateProgressForStepsAndGoal(
@@ -67,7 +67,7 @@ class _ProgressUIState extends State<ProgressUI> {
             ),
           ),
           if (widget.additionalInfo) ...[
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             ProgressAdditionalInformation(
               steps: widget.currentSteps,
               goal: widget.dailyGoal,

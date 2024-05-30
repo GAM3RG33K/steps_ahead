@@ -3,6 +3,7 @@ import 'dart:isolate';
 
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:steps_ahead/constants.dart';
+import 'package:steps_ahead/src/controllers/controllers.dart';
 import 'package:steps_ahead/src/utils/utils.dart';
 
 @pragma('vm:entry-point')
@@ -128,5 +129,47 @@ class AppForegroundServiceController {
 
   Future<bool> stopForegroundTask() {
     return FlutterForegroundTask.stopService();
+  }
+
+  Future<void> updateNotification(int steps, String bodyText) async {
+    final appForegroundServiceController =
+        AppForegroundServiceController.instance;
+
+    final notificationTitle = "$steps steps today";
+    final notificationText = bodyText;
+
+    var isForegroundServiceRunning =
+        await appForegroundServiceController.isRunningService;
+    if (!isForegroundServiceRunning) {
+      await appForegroundServiceController.startForegroundTask(
+        notificationText: notificationText,
+        notificationTitle: notificationTitle,
+      );
+    } else {
+      await appForegroundServiceController.updateForegroundTask(
+        notificationTitle: notificationTitle,
+        notificationText: notificationText,
+      );
+    }
+  }
+
+  String generateNotificationData(
+    PedometerApi pedometerApi,
+    int steps,
+    int goal,
+  ) {
+    final calories = pedometerApi.calculateCaloriesBurnedFromSteps(steps);
+    final distanceTravelled = pedometerApi.distanceTravelledFromSteps(steps);
+    final progress = FormulaUtils.instance.calculateProgressForStepsAndGoal(
+      currentSteps: steps,
+      dailyGoal: goal,
+    );
+
+    final bodyTextCalorie = "${calories.toStringAsFixed(2)} kcal";
+    final bodyTextDistance = "${distanceTravelled.toStringAsFixed(2)} Kms";
+    final bodyTextProgress =
+        "${progress.toStringAsFixed(2)}% of your daily goal";
+    final bodyText = "$bodyTextCalorie $bodyTextDistance $bodyTextProgress";
+    return bodyText;
   }
 }

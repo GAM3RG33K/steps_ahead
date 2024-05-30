@@ -3,7 +3,6 @@ import 'package:steps_ahead/constants.dart';
 import 'package:steps_ahead/src/controllers/controllers.dart';
 import 'package:steps_ahead/src/controllers/notifications/app_forground_service_controller.dart';
 import 'package:steps_ahead/src/screens/screens.dart';
-import 'package:steps_ahead/src/utils/formula_utils.dart';
 import 'package:steps_ahead/src/utils/transformer_utils.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -39,45 +38,19 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    PedometerApi.instance.stepCountStream.listen((event) {
-      final pedometerApi = PedometerApi.instance;
+    final pedometerApi = PedometerApi.instance;
+    final foregroundService = AppForegroundServiceController.instance;
+    pedometerApi.stepCountStream.listen((event) {
       final goal = pedometerApi.dailyGoal;
       final steps = pedometerApi.todayStepData.steps;
 
-      final calories = pedometerApi.calculateCaloriesBurnedFromSteps(steps);
-      final distanceTravelled = pedometerApi.distanceTravelledFromSteps(steps);
-      final progress = FormulaUtils.instance.calculateProgressForStepsAndGoal(
-        currentSteps: steps,
-        dailyGoal: goal,
+      String bodyText = foregroundService.generateNotificationData(
+        pedometerApi,
+        steps,
+        goal,
       );
-
-      final bodyTextCalorie = "${calories.toStringAsFixed(2)} kcal";
-      final bodyTextDistance = "${distanceTravelled.toStringAsFixed(2)} Kms";
-      final bodyTextProgress =
-          "${progress.toStringAsFixed(2)}% of your daily goal";
-      final bodyText = "$bodyTextCalorie $bodyTextDistance $bodyTextProgress";
-      updateNotification(steps, bodyText);
+      foregroundService.updateNotification(steps, bodyText);
     });
-  }
-
-  Future<void> updateNotification(int steps, String bodyText) async {
-    final appForegroundServiceController =
-        AppForegroundServiceController.instance;
-
-    final notificationTitle = "$steps steps today";
-    final notificationText = bodyText;
-
-    if (!(await appForegroundServiceController.isRunningService)) {
-      await appForegroundServiceController.startForegroundTask(
-        notificationText: notificationText,
-        notificationTitle: notificationTitle,
-      );
-    } else {
-      await appForegroundServiceController.updateForegroundTask(
-        notificationTitle: notificationTitle,
-        notificationText: notificationText,
-      );
-    }
   }
 
   @override
@@ -149,18 +122,33 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget buildCurrentTab(int index) {
     var countStream = PedometerApi.instance.stepCountStream;
     var dailyGoal = PedometerApi.instance.dailyGoal;
+    var initialSteps = PedometerApi.instance.currentSteps;
+    if (initialSteps == 0) {
+      initialSteps = PedometerApi.instance.lastSensorOutputFromStorage;
+    }
+
+    final foregroundService = AppForegroundServiceController.instance;
+    final bodyText = foregroundService.generateNotificationData(
+      PedometerApi.instance,
+      initialSteps,
+      dailyGoal,
+    );
+    foregroundService.updateNotification(initialSteps, bodyText);
+
     switch (index) {
       case 0:
         return ForestTab(
           key: const ValueKey(0),
           stepCountStream: countStream,
           dailyGoal: dailyGoal,
+          initialSteps: initialSteps,
         );
       case 2:
         return StatsTab(
           key: const ValueKey(2),
           stepCountStream: countStream,
           dailyGoal: dailyGoal,
+          initialSteps: initialSteps,
         );
       case 1:
       default:
@@ -168,6 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
           key: const ValueKey(1),
           stepCountStream: countStream,
           dailyGoal: dailyGoal,
+          initialSteps: initialSteps,
         );
     }
   }

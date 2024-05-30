@@ -5,11 +5,13 @@ import 'package:steps_ahead/src/screens/screens.dart';
 class StepsTab extends StatefulWidget {
   final Stream<StepData> stepCountStream;
   final int dailyGoal;
+  final int initialSteps;
 
   const StepsTab({
     super.key,
     required this.stepCountStream,
     required this.dailyGoal,
+    this.initialSteps = 0,
   });
 
   @override
@@ -43,6 +45,7 @@ class _StepsTabState extends State<StepsTab> {
               widget.stepCountStream.map(
                 (event) => event.steps,
               ),
+              initialData: widget.initialSteps,
             ),
           ],
         ),
@@ -50,12 +53,13 @@ class _StepsTabState extends State<StepsTab> {
     );
   }
 
-  Widget buildStreamBuilder(Stream<int> stepCountStream) {
+  Widget buildStreamBuilder(Stream<int> stepCountStream,
+      {int initialData = 0}) {
     return StreamBuilder<int>(
+      initialData: initialData,
       stream: stepCountStream,
       builder: (context, snapshot) {
         var val = snapshot.data ?? 0;
-
         return ProgressUI(
           currentSteps: val,
           dailyGoal: widget.dailyGoal,

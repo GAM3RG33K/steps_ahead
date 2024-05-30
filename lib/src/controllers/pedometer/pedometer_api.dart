@@ -3,14 +3,12 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:steps_ahead/constants.dart';
 import 'package:steps_ahead/src/controllers/storage_controller.dart';
 import 'package:steps_ahead/src/utils/utils.dart';
 
-import 'debug_pedometer_controller.dart';
 import 'pedometer_controller.dart';
 
 export 'package:steps_ahead/src/models/models.dart'
@@ -22,20 +20,20 @@ abstract class PedometerApi {
   PedometerApi(this.storage);
 
   static PedometerApi get instance {
-    if (kDebugMode) {
-      return get<DebugPedometerController>();
-    }
+    // if (kDebugMode) {
+    //   return get<DebugPedometerController>();
+    // }
     return get<PedometerController>();
   }
 
   static Future<PedometerApi> registerForDI() async {
     final instance = await StorageController.getInstance();
     final storage = registerSingleton(instance);
-    if (kDebugMode) {
-      return registerSingleton<DebugPedometerController>(
-        DebugPedometerController(storage),
-      );
-    }
+    // if (kDebugMode) {
+    //   return registerSingleton<DebugPedometerController>(
+    //     DebugPedometerController(storage),
+    //   );
+    // }
     final pedometerController = PedometerController(storage);
     await pedometerController.initialize();
     return registerSingleton<PedometerController>(
@@ -73,8 +71,13 @@ abstract class PedometerApi {
   Future<void> onAppLifecycleStateChange(
     AppLifecycleState state, {
     Future<void> Function(AppLifecycleState state)? processState,
-  }) =>
-      throw UnimplementedError('onAppLifecycleStateChange Not implemented Yet');
+  });
+
+  void setupInitialSteps();
+
+  void onStepCount(int steps, DateTime timestamp);
+
+  void onPedestrianStatusChanged(PedestrianStatus event);
 
   int get dailyGoal => dailyGoalFromStorage ?? kSettingsDefaultDailyGoal;
 
@@ -202,10 +205,13 @@ abstract class PedometerApi {
         steps,
       );
 
-  StepData getUpdatedCurrentSteps(StepCount stepCount) {
-    final lastSensorData = lastSensorOutputFromStorage;
-    final sensorDiff = max(lastSensorData - stepCount.steps, 0);
-    lastSensorOutputFromStorage = stepCount.steps;
+  StepData getUpdatedCurrentSteps(int stepCount) {
+    final recentData = todayStepData.steps > 0
+        ? todayStepData.steps
+        : lastSensorOutputFromStorage;
+    final sensorDiff = max((recentData - stepCount).abs(), 0);
+
+    lastSensorOutputFromStorage = stepCount;
 
     final newSteps = todayStepData.addSteps(sensorDiff);
     return newSteps;

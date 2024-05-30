@@ -5,11 +5,13 @@ import 'package:steps_ahead/src/screens/screens.dart';
 class StatsTab extends StatefulWidget {
   final Stream<StepData> stepCountStream;
   final int dailyGoal;
+  final int initialSteps;
 
   const StatsTab({
     super.key,
     required this.stepCountStream,
     required this.dailyGoal,
+    this.initialSteps = 0,
   });
 
   @override
@@ -38,10 +40,10 @@ class _StatsTabState extends State<StatsTab> {
               tabs: tabs
                   .map(
                     (e) => Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(e),
-                ),
-              )
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(e),
+                    ),
+                  )
                   .toList(),
             ),
           ),
