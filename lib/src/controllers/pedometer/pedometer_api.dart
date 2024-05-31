@@ -3,13 +3,12 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:steps_ahead/constants.dart';
-import 'package:steps_ahead/src/controllers/storage_controller.dart';
+import 'package:steps_ahead/src/controllers/controllers.dart';
 import 'package:steps_ahead/src/utils/utils.dart';
-
-import 'pedometer_controller.dart';
 
 export 'package:steps_ahead/src/models/models.dart'
     show PedestrianStatusData, StepData;
@@ -20,20 +19,25 @@ abstract class PedometerApi {
   PedometerApi(this.storage);
 
   static PedometerApi get instance {
-    // if (kDebugMode) {
-    //   return get<DebugPedometerController>();
-    // }
+    if (kDebugMode) {
+      return get<DebugPedometerController>();
+    }
     return get<PedometerController>();
   }
 
   static Future<PedometerApi> registerForDI() async {
-    final instance = await StorageController.getInstance();
-    final storage = registerSingleton(instance);
-    // if (kDebugMode) {
-    //   return registerSingleton<DebugPedometerController>(
-    //     DebugPedometerController(storage),
-    //   );
-    // }
+    final storage = StorageController.instance;
+
+    if (kDebugMode) {
+      final debugPedometerController = DebugPedometerController(storage);
+      await debugPedometerController.initialize();
+
+      registerSingleton<DebugPedometerController>(
+        debugPedometerController,
+      );
+
+      return debugPedometerController;
+    }
     final pedometerController = PedometerController(storage);
     await pedometerController.initialize();
     return registerSingleton<PedometerController>(
@@ -204,6 +208,13 @@ abstract class PedometerApi {
         kSettingsKeyLastSensorOutput,
         steps,
       );
+
+  String get kSettingsKeyLastSensorOutput {
+    final getCurrentDate = DateTime.now().toIso8601String().split("T")[0];
+    var storageDateKey = "$kSettingsKeyLastSensorOutputPrefix\_$getCurrentDate"
+        .replaceAll("-", "_");
+    return storageDateKey;
+  }
 
   StepData getUpdatedCurrentSteps(int stepCount) {
     final recentData = todayStepData.steps > 0

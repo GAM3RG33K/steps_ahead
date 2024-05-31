@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:steps_ahead/constants.dart';
 import 'package:steps_ahead/src/utils/utils.dart';
 
 import 'pedometer_api.dart';
@@ -21,6 +22,33 @@ class PedometerController extends PedometerApi {
       await _initPedometerStreams();
 
       setupInitialSteps();
+
+      final alarmManager = AlarmManager.instance;
+      alarmManager.registerListener("dateChange", (triggerTime) async {
+        Log.d(
+          message:
+              "PedometerController.initialize : dateChange trigger: $triggerTime",
+        );
+
+        final storedTime = storage.getSettingInt(kCurrentTimerDateKey);
+        await storage.setSettingInt(
+          kCurrentTimerDateKey,
+          DateTime.now().millisecondsSinceEpoch,
+        );
+
+        if (storedTime == null) {
+          return;
+        }
+
+        final dateTime = DateTime.fromMillisecondsSinceEpoch(
+          storedTime,
+        );
+
+        final currentDateTime = DateTime.now();
+        if (currentDateTime.toDateString != dateTime.toDateString) {
+          resetDataForTheDay();
+        }
+      });
       isInitialized = true;
     }
   }
@@ -125,4 +153,15 @@ class PedometerController extends PedometerApi {
 
   @override
   int get currentSteps => _currentSteps;
+
+  void resetDataForTheDay() {
+    Log.i(message: "Steps Ahead: Resetting data for the day");
+    _currentSteps = 0;
+    todayStepData = StepData(
+      lastUpdateTimeStamp: DateTime.now(),
+      steps: 0,
+      goalAtTheTime: dailyGoal,
+    );
+    lastSensorOutputFromStorage = 0;
+  }
 }

@@ -3,11 +3,11 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
+import 'package:steps_ahead/constants.dart';
+import 'package:steps_ahead/src/controllers/controllers.dart';
 import 'package:steps_ahead/src/utils/utils.dart';
 
-import 'pedometer_api.dart';
-
-class DebugPedometerController extends PedometerApi {
+class DebugPedometerController extends PedometerController {
   DebugPedometerController(super.storage) {
     debugTimer = Timer.periodic(
       const Duration(milliseconds: 1500),
@@ -65,7 +65,41 @@ class DebugPedometerController extends PedometerApi {
   }
 
   @override
-  Future<void> initialize() async {}
+  Future<void> initialize() async {
+    super.initialize();
+    final alarmManager = AlarmManager.instance;
+    alarmManager.registerListener("debugChange", (triggerTime) async {
+      Log.d(
+        message:
+            "DebugPedometerController.initialize : debugChange trigger: $triggerTime",
+      );
+
+      final storedTime = storage.getSettingInt(kCurrentTimerDateKey);
+      await storage.setSettingInt(
+        kCurrentTimerDateKey,
+        DateTime.now().millisecondsSinceEpoch,
+      );
+
+      if (storedTime == null) {
+        return;
+      }
+
+      final dateTime = DateTime.fromMillisecondsSinceEpoch(
+        storedTime,
+      );
+
+      final currentDateTime = DateTime.now();
+      if (dateTime.minute != triggerTime.minute) {
+        Log.d(
+          message: "DebugPedometerController.debugChange : Resetting data",
+        );
+        stepCount = 0;
+        stepCountStreamController.sink.add(
+          StepData.fromCount(stepCount, dailyGoal),
+        );
+      }
+    });
+  }
 
   @override
   void dispose() {
