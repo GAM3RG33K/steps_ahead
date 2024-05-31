@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:isolate';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:steps_ahead/constants.dart';
 import 'package:steps_ahead/src/controllers/controllers.dart';
@@ -39,6 +40,10 @@ class ForegroundTaskHandler extends TaskHandler {
   @override
   void onNotificationButtonPressed(String id) {
     print('onNotificationButtonPressed >> $id');
+    if (id == "exitButton") {
+      FlutterForegroundTask.stopService();
+      SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+    }
   }
 
   // Called when the notification itself on the Android platform is pressed.
@@ -81,10 +86,9 @@ class AppForegroundServiceController {
         isSticky: true,
         playSound: false,
         enableVibration: false,
-        // buttons: [
-        //   const NotificationButton(id: 'sendButton', text: 'Send'),
-        //   const NotificationButton(id: 'testButton', text: 'Test'),
-        // ],
+        buttons: [
+          const NotificationButton(id: 'exitButton', text: 'Exit'),
+        ],
       ),
       iosNotificationOptions: const IOSNotificationOptions(
         showNotification: true,
@@ -112,6 +116,7 @@ class AppForegroundServiceController {
     return FlutterForegroundTask.startService(
       notificationTitle: notificationTitle,
       notificationText: notificationText,
+      callback: callback,
     );
   }
 
@@ -144,11 +149,13 @@ class AppForegroundServiceController {
       await appForegroundServiceController.startForegroundTask(
         notificationText: notificationText,
         notificationTitle: notificationTitle,
+        callback: startCallback,
       );
     } else {
       await appForegroundServiceController.updateForegroundTask(
         notificationTitle: notificationTitle,
         notificationText: notificationText,
+        callback: startCallback,
       );
     }
   }

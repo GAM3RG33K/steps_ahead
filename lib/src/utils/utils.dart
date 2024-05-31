@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 export 'di_utils.dart';
 export 'formula_utils.dart';
 export 'logs_utils.dart';
+export 'timer_utils.dart';
 export 'transformer_utils.dart';
 export 'widget_utils.dart';
 

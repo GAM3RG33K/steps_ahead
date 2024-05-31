@@ -28,6 +28,9 @@ void main() async {
 
 Future<void> registerDependencies() async {
   registerSingleton(FormulaUtils());
+  await StorageController.registerForDI();
+  await AlarmManager.registerForDI();
+
   final notificationController = AppNotificationController(
     FlutterLocalNotificationsPlugin(),
   );

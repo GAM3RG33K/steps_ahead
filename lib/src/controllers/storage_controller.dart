@@ -12,9 +12,10 @@ class StorageController {
 
   bool isInitialized = false;
 
-  static Future<StorageController> getInstance() async {
+  static Future<StorageController> registerForDI() async {
     final prefs = await SharedPreferences.getInstance();
-    return StorageController(prefs);
+    final instance = StorageController(prefs);
+    return registerSingleton<StorageController>(instance);
   }
 
   Future<void> onAppLifecycleStateChange(
